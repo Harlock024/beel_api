@@ -41,5 +41,36 @@ func main() {
 	// delete task
 	r.DELETE("/api/tasks/:id", handlers.DeleteTask)
 
+	// LIST ENDPOINTS
+
+	// create list
+	r.POST("/api/lists", handlers.CreateList)
+
+	// list lists
+	r.GET("/api/lists", handlers.FindListByUser)
+
+	// update list
+	r.PUT("/api/lists/:id", handlers.UpdateList)
+
+	// delete list
+	r.DELETE("/api/lists/:id", handlers.DeleteList)
+
+	// TAGS ENDPOINTS
+
+	// list tags
+	r.GET("/api/tags", handlers.FindTagsByUser)
+
+	// get tag
+	r.GET("/api/tags/:id", handlers.GetTask)
+
+	// create tag
+	r.POST("/api/tags", handlers.CreateTag)
+
+	// update tag
+	r.PUT("/api/tags/:id", handlers.UpdateTag)
+
+	// delete tag
+	r.DELETE("/api/tags/:id", handlers.DeleteTag)
+
 	r.Run("localhost:8080")
 }

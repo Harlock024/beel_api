@@ -4,7 +4,7 @@ import "github.com/google/uuid"
 
 type Tag struct {
 	ID        uuid.UUID `json:"id" gorm:"primaryKey;default:uuid_generate_v4()"`
-	Name      string    `json:"name"`
+	Name      string    `json:"name" gorm:"not null"`
 	CreatedBy uuid.UUID
 	User      User   `gorm:"foreignKey:CreatedBy"`
 	Color     string `json:"color"`

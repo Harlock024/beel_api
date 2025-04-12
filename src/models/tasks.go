@@ -8,9 +8,9 @@ import (
 
 type Task struct {
 	ID          uuid.UUID `json:"id" gorm:"primaryKey"`
-	Title       string    `json:"title"`
+	Title       string    `json:"title" gorm:"not null"`
 	Description string    `json:"description"`
-	UserID      uuid.UUID `json:"user_id"`
+	UserID      uuid.UUID `json:"user_id" `
 	Status      bool      `json:"status"`
 	DueDate     time.Time `json:"due_date"`
 	CreatedAt   time.Time `json:"created_at"`
