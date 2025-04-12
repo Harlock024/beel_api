@@ -1,9 +1,11 @@
 package models
 
+import "github.com/google/uuid"
+
 type Task struct {
-	ID          string `json:"id" gorm:"primaryKey"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	UserID      string `json:"userId"`
-	ListID      string `json:"listId"`
+	ID          uuid.UUID `json:"id" gorm:"primaryKey"`
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	UserID      uuid.UUID `json:"user_id"`
+	Status      bool      `json:"status"`
 }

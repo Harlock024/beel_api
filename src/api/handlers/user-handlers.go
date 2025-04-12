@@ -10,6 +10,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -28,10 +29,7 @@ func LoginHandler(c *gin.Context) {
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
-				"error":   "user not found",
-				"login":   login,
-				"user":    userFound,
-				"message": "user not found",
+				"error": "user not found",
 			})
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -45,7 +43,7 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 
-	token, err := utils.CreateToken(userFound.Username)
+	token, err := utils.CreateToken(userFound.Username, userFound.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -70,29 +68,45 @@ func CreateUser(c *gin.Context) {
 	}
 
 	var newUser models.User
+	newUser.ID = uuid.New()
 	newUser.Email = user.Email
 	newUser.Username = user.Username
 	newUser.Password = passwordHashed
 
-	context.DB.Create(&newUser)
+	err = context.DB.Create(&newUser).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	token, err := utils.CreateToken(newUser.Username, newUser.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"message": "user saved",
+		"token":   token,
 	})
 }
 
 func GetUser(c *gin.Context) {
-	var users []models.User
-	context.DB.Find(&users)
-	c.JSON(http.StatusOK, users)
-}
-
-func GetUserByID(c *gin.Context) {
-	var user models.User
-	context.DB.Where("id=?", c.Param("id")).Find(&user)
-
-	if user.ID == uuid.Nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "user not found"})
+	claimsRaw, exists := c.Get("claims")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Unauthorized"})
 		return
 	}
-	c.JSON(http.StatusOK, user)
+
+	claims := claimsRaw.(jwt.MapClaims)
+	user_id := claims["user_id"].(string)
+
+	var user models.User
+	if err := context.DB.First(&user, "id = ?", user_id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"user": user,
+	})
 }
