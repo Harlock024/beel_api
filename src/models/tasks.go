@@ -14,4 +14,8 @@ type Task struct {
 	Status      bool      `json:"status"`
 	DueDate     time.Time `json:"due_date"`
 	CreatedAt   time.Time `json:"created_at"`
+	ListID      *uuid.UUID
+	List        *List `gorm:"foreignKey:ListID"`
+
+	Tags []Tag `gorm:"many2many:task_tags;"`
 }

@@ -7,5 +7,6 @@ type User struct {
 	Username string    `json:"username"`
 	Email    string    `json:"email" gorm:"unique"`
 	Password string    `json:"password"`
-	Tasks    []Task    `json:"tasks" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
+	Tasks    []Task
+	Tags     []Tag `gorm:"foreignkey:CreatedBy"`
 }
