@@ -1,9 +1,10 @@
 package handlers
 
 import (
-	"beel_api/src/context"
+	"beel_api/src/db"
 	"beel_api/src/dtos"
-	"beel_api/src/models"
+	"beel_api/src/internal/models"
+
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -11,7 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func FindTagsByUser(c *gin.Context) {
+func GetTags(c *gin.Context) {
 
 	claimsRaw, exists := c.Get("claims")
 	if !exists {
@@ -23,7 +24,7 @@ func FindTagsByUser(c *gin.Context) {
 	userID := claims["user_id"].(string)
 
 	tags := []models.Tag{}
-	err := context.DB.Where("created_by = ?", userID).Find(&tags).Error
+	err := db.DB.Where("created_by = ?", userID).Find(&tags).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -31,7 +32,7 @@ func FindTagsByUser(c *gin.Context) {
 	c.JSON(http.StatusOK, tags)
 }
 
-func getTag(c *gin.Context) {
+func GetTag(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid tag ID"})
@@ -39,7 +40,7 @@ func getTag(c *gin.Context) {
 	}
 
 	tag := models.Tag{}
-	err := context.DB.First(&tag, id).Error
+	err := db.DB.First(&tag, id).Error
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
@@ -69,7 +70,7 @@ func CreateTag(c *gin.Context) {
 	newTag.Name = tag.Name
 	newTag.Color = tag.Color
 	newTag.CreatedBy = uuid.MustParse(userID)
-	err := context.DB.Create(&newTag).Error
+	err := db.DB.Create(&newTag).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -101,7 +102,7 @@ func UpdateTag(c *gin.Context) {
 	}
 
 	var tag models.Tag
-	err := context.DB.Where("id = ? AND created_by = ?", taskID, userID).First(&tag).Error
+	err := db.DB.Where("id = ? AND created_by = ?", taskID, userID).First(&tag).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Tag not found"})
 		return
@@ -110,7 +111,7 @@ func UpdateTag(c *gin.Context) {
 	tag.Name = updateTag.Name
 	tag.Color = updateTag.Color
 
-	err = context.DB.Save(&tag).Error
+	err = db.DB.Save(&tag).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -125,7 +126,7 @@ func DeleteTag(c *gin.Context) {
 		return
 	}
 
-	err := context.DB.Delete(&tag).Error
+	err := db.DB.Delete(&tag).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

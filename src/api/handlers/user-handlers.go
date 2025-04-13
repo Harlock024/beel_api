@@ -1,10 +1,11 @@
 package handlers
 
 import (
-	"beel_api/src/api/utils"
-	"beel_api/src/context"
+	"beel_api/src/db"
 	"beel_api/src/dtos"
-	"beel_api/src/models"
+	"beel_api/src/internal/models"
+
+	"beel_api/src/pkg/utils"
 	"errors"
 
 	"net/http"
@@ -24,7 +25,7 @@ func LoginHandler(c *gin.Context) {
 	}
 
 	var userFound models.User
-	err := context.DB.Where("email=?", login.Email).First(&userFound).Error
+	err := db.DB.Where("email=?", login.Email).First(&userFound).Error
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -53,7 +54,7 @@ func LoginHandler(c *gin.Context) {
 	})
 }
 
-func CreateUser(c *gin.Context) {
+func RegisterHandler(c *gin.Context) {
 	var user dtos.RegisterDTO
 
 	if err := c.ShouldBindJSON(&user); err != nil {
@@ -73,7 +74,7 @@ func CreateUser(c *gin.Context) {
 	newUser.Username = user.Username
 	newUser.Password = passwordHashed
 
-	err = context.DB.Create(&newUser).Error
+	err = db.DB.Create(&newUser).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -91,7 +92,7 @@ func CreateUser(c *gin.Context) {
 	})
 }
 
-func GetUser(c *gin.Context) {
+func GetMe(c *gin.Context) {
 	claimsRaw, exists := c.Get("claims")
 	if !exists {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Unauthorized"})
@@ -102,7 +103,7 @@ func GetUser(c *gin.Context) {
 	user_id := claims["user_id"].(string)
 
 	var user models.User
-	if err := context.DB.First(&user, "id = ?", user_id).Error; err != nil {
+	if err := db.DB.First(&user, "id = ?", user_id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}

@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"beel_api/src/context"
+	"beel_api/src/db"
 	"beel_api/src/dtos"
-	"beel_api/src/models"
+	"beel_api/src/internal/models"
 
 	"net/http"
 
@@ -35,7 +35,7 @@ func CreateTask(c *gin.Context) {
 	newTask.UserID = uuid.MustParse(user_id)
 	newTask.Status = false
 
-	err := context.DB.Create(&newTask).Error
+	err := db.DB.Create(&newTask).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -44,7 +44,7 @@ func CreateTask(c *gin.Context) {
 	return
 }
 
-func GetUserTasks(c *gin.Context) {
+func GetTasks(c *gin.Context) {
 	claimsRaw, exists := c.Get("claims")
 	if !exists {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Unauthorized"})
@@ -55,7 +55,7 @@ func GetUserTasks(c *gin.Context) {
 	user_id := claims["user_id"].(string)
 
 	var tasks []models.Task
-	err := context.DB.Where("user_id = ?", user_id).Find(&tasks).Error
+	err := db.DB.Where("user_id = ?", user_id).Find(&tasks).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -88,7 +88,7 @@ func UpdateTask(c *gin.Context) {
 	}
 
 	var task models.Task
-	if err := context.DB.Preload("Tags").First(&task, "id = ? AND user_id = ?", taskID, user_id).Error; err != nil {
+	if err := db.DB.Preload("Tags").First(&task, "id = ? AND user_id = ?", taskID, user_id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "task not found"})
 		return
 	}
@@ -99,18 +99,18 @@ func UpdateTask(c *gin.Context) {
 
 	if len(dto.TagIDs) > 0 {
 		var tags []models.Tag
-		if err := context.DB.Where("id IN ?", dto.TagIDs).Find(&tags).Error; err != nil {
+		if err := db.DB.Where("id IN ?", dto.TagIDs).Find(&tags).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch tags"})
 			return
 		}
-		if err := context.DB.Model(&task).Association("Tags").Replace(tags); err != nil {
+		if err := db.DB.Model(&task).Association("Tags").Replace(tags); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update tags"})
 			return
 		}
 	} else {
-		context.DB.Model(&task).Association("Tags").Clear()
+		db.DB.Model(&task).Association("Tags").Clear()
 	}
-	if err := context.DB.Save(&task).Error; err != nil {
+	if err := db.DB.Save(&task).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -134,7 +134,7 @@ func GetTask(c *gin.Context) {
 	}
 
 	var task models.Task
-	err := context.DB.Where("id = ? AND user_id = ?", taskID, user_id).First(&task).Error
+	err := db.DB.Where("id = ? AND user_id = ?", taskID, user_id).First(&task).Error
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
 		return
@@ -160,13 +160,13 @@ func DeleteTask(c *gin.Context) {
 	}
 
 	var task models.Task
-	err := context.DB.Where("id = ? AND user_id = ?", taskID, user_id).First(&task).Error
+	err := db.DB.Where("id = ? AND user_id = ?", taskID, user_id).First(&task).Error
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
 		return
 	}
 
-	err = context.DB.Delete(&task).Error
+	err = db.DB.Delete(&task).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

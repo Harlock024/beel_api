@@ -1,7 +1,6 @@
-package context
+package db
 
 import (
-	"beel_api/src/models"
 	"log"
 	"os"
 
@@ -22,9 +21,5 @@ func InitDB() {
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
-	}
-
-	if err := DB.AutoMigrate(&models.User{}, &models.Task{}, models.List{}, models.Tag{}); err != nil {
-		log.Fatal("Failed to migrate schema:", err)
 	}
 }
