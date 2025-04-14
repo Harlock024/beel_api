@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"os"
 	"time"
 
@@ -9,32 +8,45 @@ import (
 	"github.com/google/uuid"
 )
 
-var secretKey = []byte(os.Getenv("SECRET_KEY"))
+var refreshSecretKey = []byte(os.Getenv("REFRESH_SECRET_KEY"))
+var accessSecretKey = []byte(os.Getenv("ACCESS_SECRET_KEY"))
 
-func CreateToken(username string, userId uuid.UUID) (string, error) {
+func GenerateTokens(username string, userId uuid.UUID) (string, string, error) {
+	accessToken, err := CreateAccessToken(username, userId)
+	if err != nil {
+		return "", "", err
+	}
+	refreshToken, err := CreateRefreshToken(username, userId)
+	if err != nil {
+		return "", "", err
+	}
+	return accessToken, refreshToken, nil
+}
+
+func CreateRefreshToken(username string, userId uuid.UUID) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
 			"user_id":  userId,
 			"username": username,
-			"exp":      time.Now().Add(time.Hour * 24).Unix(),
+			"exp":      time.Now().Add(time.Hour * 24 * 30).Unix(),
 		})
-	tokenString, err := token.SignedString(secretKey)
+	tokenString, err := token.SignedString(refreshSecretKey)
 	if err != nil {
 		return "", err
 	}
 	return tokenString, nil
 }
 
-func VerifyTokens(tokenString string) error {
-
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return secretKey, nil
-	})
+func CreateAccessToken(username string, userId uuid.UUID) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
+		jwt.MapClaims{
+			"user_id":  userId,
+			"username": username,
+			"exp":      time.Now().Add(time.Hour * 24).Unix(),
+		})
+	tokenString, err := token.SignedString(accessSecretKey)
 	if err != nil {
-		return err
+		return "", err
 	}
-	if !token.Valid {
-		return fmt.Errorf("invalid token")
-	}
-	return nil
+	return tokenString, nil
 }

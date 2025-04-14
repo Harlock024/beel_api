@@ -20,14 +20,13 @@ func main() {
 	}
 
 	api := r.Group("/api")
+
 	{
-
 		api.Use(middleware.AuthMiddleware())
-
+		routes.RefreshRoutes(api)
 		routes.TaskRoutes(api)
 		routes.ListRoutes(api)
 		routes.TagRoutes(api)
-
 	}
 
 	r.Run("localhost:8080")

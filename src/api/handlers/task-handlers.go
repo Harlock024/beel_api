@@ -43,7 +43,6 @@ func CreateTask(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"task": newTask})
 	return
 }
-
 func GetTasks(c *gin.Context) {
 	claimsRaw, exists := c.Get("claims")
 	if !exists {

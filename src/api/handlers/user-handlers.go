@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"beel_api/src/api/responses"
 	"beel_api/src/db"
 	"beel_api/src/dtos"
 	"beel_api/src/internal/models"
+	"time"
 
 	"beel_api/src/pkg/utils"
 	"errors"
@@ -44,13 +46,28 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 
-	token, err := utils.CreateToken(userFound.Username, userFound.ID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+	accessToken, refreshToken, err := utils.GenerateTokens(userFound.Username, userFound.ID)
+
+	db.DB.Save(models.RefreshToken{
+		ID:          uuid.New(),
+		UserID:      userFound.ID,
+		ExpiresAt:   time.Now().Add(time.Hour * 24 * 30),
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+		HashedToken: utils.HashToken(refreshToken),
+		IsRevoked:   false,
+	})
+
+	var UserFoundResponse responses.UserResponse
+	UserFoundResponse.ID = userFound.ID
+	UserFoundResponse.Username = userFound.Username
+	UserFoundResponse.Email = userFound.Email
+	UserFoundResponse.AvatarURL = userFound.AvatarURL
+
 	c.JSON(http.StatusOK, gin.H{
-		"token": token,
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
+		"user":          UserFoundResponse,
 	})
 }
 
@@ -80,15 +97,29 @@ func RegisterHandler(c *gin.Context) {
 		return
 	}
 
-	token, err := utils.CreateToken(newUser.Username, newUser.ID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+	accessToken, refreshToken, err := utils.GenerateTokens(newUser.Username, newUser.ID)
+
+	db.DB.Save(models.RefreshToken{
+		ID:          uuid.New(),
+		UserID:      newUser.ID,
+		ExpiresAt:   time.Now().Add(time.Hour * 24 * 30),
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+		HashedToken: utils.HashToken(refreshToken),
+		IsRevoked:   false,
+	})
+
+	var UserFoundResponse responses.UserResponse
+	UserFoundResponse.ID = newUser.ID
+	UserFoundResponse.Username = newUser.Username
+	UserFoundResponse.Email = newUser.Email
+	UserFoundResponse.AvatarURL = newUser.AvatarURL
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "user saved",
-		"token":   token,
+
+		"token":         accessToken,
+		"refresh_token": refreshToken,
+		"user":          UserFoundResponse,
 	})
 }
 
@@ -107,7 +138,14 @@ func GetMe(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
+
+	var UserFoundResponse responses.UserResponse
+	UserFoundResponse.ID = user.ID
+	UserFoundResponse.Username = user.Username
+	UserFoundResponse.Email = user.Email
+	UserFoundResponse.AvatarURL = user.AvatarURL
+
 	c.JSON(http.StatusOK, gin.H{
-		"user": user,
+		"user": UserFoundResponse,
 	})
 }

@@ -14,8 +14,14 @@ var secretKey = os.Getenv("JWT_SECRET")
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		auth := c.GetHeader("Authorization")
+		refresh := c.GetHeader("refresh_token")
 
 		if auth == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			c.Abort()
+			return
+		}
+		if refresh == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 			c.Abort()
 			return
@@ -44,6 +50,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 		if claims, ok := token.Claims.(jwt.MapClaims); ok {
 			c.Set("claims", claims)
+			c.Set("refresh_token", refresh)
 
 			c.Next()
 		} else {
