@@ -7,5 +7,5 @@ import (
 )
 
 func RefreshRoutes(router *gin.RouterGroup) {
-	router.GET("/refresh", handlers.RefreshTokenHandler)
+	router.POST("/refresh", handlers.RefreshTokenHandler)
 }

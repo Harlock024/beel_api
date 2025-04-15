@@ -27,6 +27,7 @@ func main() {
 		routes.TaskRoutes(api)
 		routes.ListRoutes(api)
 		routes.TagRoutes(api)
+
 	}
 
 	r.Run("localhost:8080")

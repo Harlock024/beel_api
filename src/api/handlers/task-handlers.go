@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"beel_api/src/api/responses"
 	"beel_api/src/db"
 	"beel_api/src/dtos"
 	"beel_api/src/internal/models"
@@ -40,7 +41,8 @@ func CreateTask(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusCreated, gin.H{"task": newTask})
+
+	c.JSON(http.StatusCreated, gin.H{"task": responses.TaskRes(newTask)})
 	return
 }
 func GetTasks(c *gin.Context) {

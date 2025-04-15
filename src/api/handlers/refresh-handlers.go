@@ -3,6 +3,7 @@ package handlers
 import (
 	"beel_api/src/api/responses"
 	"beel_api/src/db"
+	"beel_api/src/dtos"
 	"beel_api/src/internal/models"
 	"beel_api/src/pkg/utils"
 	"net/http"
@@ -12,17 +13,12 @@ import (
 )
 
 func RefreshTokenHandler(c *gin.Context) {
+	var refresh_token dtos.RefreshRequest
 
-	refreshRaw, exists := c.Get("refresh_token")
-
-	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing refresh token"})
-		return
+	if err := c.ShouldBindJSON(&refresh_token); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"erro": "Invalid refresh token payload"})
 	}
-
-	refreshToken := refreshRaw.(string)
-
-	hashedToken := utils.HashToken(refreshToken)
+	hashedToken := utils.HashToken(refresh_token.RefreshToken)
 
 	var savedToken models.RefreshToken
 
@@ -54,10 +50,9 @@ func RefreshTokenHandler(c *gin.Context) {
 
 	newToken := models.RefreshToken{
 		HashedToken: utils.HashToken(newRefreshToken),
-
-		UserID:    user.ID,
-		ExpiresAt: time.Now().Add(7 * 24 * 30),
-		IsRevoked: false,
+		UserID:      user.ID,
+		ExpiresAt:   time.Now().Add(7 * 24 * 30),
+		IsRevoked:   false,
 	}
 	if err := db.DB.Create(&newToken).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to store refresh token"})
