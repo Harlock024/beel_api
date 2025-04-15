@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func RefreshTokenHandler(c *gin.Context) {
@@ -49,6 +50,7 @@ func RefreshTokenHandler(c *gin.Context) {
 	}
 
 	newToken := models.RefreshToken{
+		ID:          uuid.New(),
 		HashedToken: utils.HashToken(newRefreshToken),
 		UserID:      user.ID,
 		ExpiresAt:   time.Now().Add(7 * 24 * 30),
