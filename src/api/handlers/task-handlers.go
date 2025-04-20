@@ -41,7 +41,6 @@ func CreateTask(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
 	c.JSON(http.StatusCreated, gin.H{"task": responses.TaskRes(newTask)})
 	return
 }
@@ -61,7 +60,14 @@ func GetTasks(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"tasks": tasks})
+	var tasksRes []responses.TaskResponse
+
+	for _, task := range tasks {
+		taskres := responses.TaskRes(task)
+		tasksRes = append(tasksRes, taskres)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"tasks": tasksRes})
 	return
 }
 
