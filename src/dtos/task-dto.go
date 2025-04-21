@@ -10,7 +10,7 @@ type NewTaskDTO struct {
 type UpdateTaskDTO struct {
 	Title       string      `json:"title"`
 	Description string      `json:"description"`
-	Status      string      `json:"status"`
+	Status      bool        `json:"status"`
 	ListID      *uuid.UUID  `json:"list_id"`
 	TagIDs      []uuid.UUID `json:"tag_ids"`
 }

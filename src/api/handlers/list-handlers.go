@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"beel_api/src/api/responses"
 	"beel_api/src/db"
 	"beel_api/src/dtos"
 	"beel_api/src/internal/models"
@@ -28,8 +29,13 @@ func FindListsByUser(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, list)
 
+	ListResponses := make([]responses.ListResponse, len(list))
+	for i, l := range list {
+		ListResponses[i] = responses.NewListResponse(l)
+	}
+	c.JSON(http.StatusOK, gin.H{"lists": ListResponses})
+	return
 }
 
 func CreateList(c *gin.Context) {
@@ -59,7 +65,8 @@ func CreateList(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, newList)
+	c.JSON(http.StatusCreated, gin.H{"list": responses.NewListResponse(newList)})
+	return
 }
 
 func DeleteList(c *gin.Context) {
@@ -85,6 +92,7 @@ func DeleteList(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusNoContent, nil)
+	return
 }
 
 func UpdateList(c *gin.Context) {
@@ -116,5 +124,6 @@ func UpdateList(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, list)
+	c.JSON(http.StatusOK, gin.H{"list": responses.NewListResponse(updatedList)})
+	return
 }

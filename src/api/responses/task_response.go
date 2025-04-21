@@ -13,7 +13,6 @@ type TaskResponse struct {
 	ListID      string   `json:"list_id"`
 	Tags        []string `json:"tags"`
 }
-
 type TaskResponses []TaskResponse
 
 func TaskRes(task models.Task) TaskResponse {

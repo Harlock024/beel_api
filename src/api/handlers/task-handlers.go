@@ -74,6 +74,8 @@ func GetTasks(c *gin.Context) {
 func UpdateTask(c *gin.Context) {
 
 	id := c.Param("id")
+	var dto dtos.UpdateTaskDTO
+
 	taskID, err := uuid.Parse(id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid task id"})
@@ -88,7 +90,6 @@ func UpdateTask(c *gin.Context) {
 	claims := claimsRaw.(jwt.MapClaims)
 	user_id := claims["user_id"].(string)
 
-	var dto dtos.UpdateTaskDTO
 	if err := c.ShouldBindJSON(&dto); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
