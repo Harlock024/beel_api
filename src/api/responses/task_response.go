@@ -12,6 +12,7 @@ type TaskResponse struct {
 	Status      bool     `json:"status"`
 	ListID      string   `json:"list_id"`
 	Tags        []string `json:"tags"`
+	DueDate     string   `json:"due_date"`
 }
 type TaskResponses []TaskResponse
 
@@ -23,6 +24,7 @@ func TaskRes(task models.Task) TaskResponse {
 	taskResponse.Description = task.Description
 	taskResponse.UserID = task.UserID.String()
 	taskResponse.Status = task.Status
+	taskResponse.DueDate = task.DueDate
 
 	if task.ListID != nil {
 		taskResponse.ListID = task.ListID.String()

@@ -35,6 +35,7 @@ func CreateTask(c *gin.Context) {
 	newTask.Title = task.Title
 	newTask.UserID = uuid.MustParse(user_id)
 	newTask.Status = false
+	newTask.ListID = nil
 
 	err := db.DB.Create(&newTask).Error
 	if err != nil {
@@ -104,6 +105,8 @@ func UpdateTask(c *gin.Context) {
 	task.Title = dto.Title
 	task.Description = dto.Description
 	task.ListID = dto.ListID
+	task.DueDate = dto.DueDate
+	task.Status = dto.Status
 
 	if len(dto.TagIDs) > 0 {
 		var tags []models.Tag
