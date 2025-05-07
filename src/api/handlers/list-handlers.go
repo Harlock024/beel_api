@@ -96,7 +96,7 @@ func DeleteList(c *gin.Context) {
 }
 
 func UpdateList(c *gin.Context) {
-	var list dtos.ListDTO
+	var listToUpdate dtos.ListDTO
 	claimsRaw, exists := c.Get("claims")
 	if !exists {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Unauthorized"})
@@ -106,19 +106,19 @@ func UpdateList(c *gin.Context) {
 	claims := claimsRaw.(jwt.MapClaims)
 	user_id := claims["user_id"].(string)
 
+	var list models.List
 	if err := db.DB.Where("user_id = ? AND id = ?", user_id, c.Param("id")).First(&list).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
-
-	if err := c.BindJSON(&list); err != nil {
+	if err := c.BindJSON(&listToUpdate); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	var updatedList models.List
-	updatedList.Title = list.Name
-	updatedList.Color = list.Color
+	updatedList.Title = listToUpdate.Name
+	updatedList.Color = listToUpdate.Color
 
 	if err := db.DB.Save(&updatedList).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

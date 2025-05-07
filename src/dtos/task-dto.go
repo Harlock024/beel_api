@@ -8,7 +8,6 @@ type NewTaskDTO struct {
 	Title  string `json:"title"`
 	ListID string `json:"list_id"`
 }
-
 type UpdateTaskDTO struct {
 	Title       string      `json:"title"`
 	Description string      `json:"description"`

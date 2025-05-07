@@ -5,6 +5,7 @@ import (
 	"beel_api/src/db"
 	"beel_api/src/dtos"
 	"beel_api/src/internal/models"
+	"fmt"
 
 	"net/http"
 
@@ -35,7 +36,16 @@ func CreateTask(c *gin.Context) {
 	newTask.Title = task.Title
 	newTask.UserID = uuid.MustParse(user_id)
 	newTask.Status = false
-	newTask.ListID = nil
+
+	if task.ListID != "" {
+		parsedID, err := uuid.Parse(task.ListID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		newTask.ListID = &parsedID
+	}
+	fmt.Printf("%s", task)
 
 	err := db.DB.Create(&newTask).Error
 	if err != nil {
