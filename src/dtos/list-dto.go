@@ -1,6 +1,6 @@
 package dtos
 
 type ListDTO struct {
-	Name  string `json:"name"`
+	Title string `json:"title"`
 	Color string `json:"color"`
 }

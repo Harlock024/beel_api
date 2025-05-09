@@ -5,8 +5,7 @@ import (
 )
 
 type NewTaskDTO struct {
-	Title  string `json:"title"`
-	ListID string `json:"list_id"`
+	Title string `json:"title"`
 }
 type UpdateTaskDTO struct {
 	Title       string      `json:"title"`

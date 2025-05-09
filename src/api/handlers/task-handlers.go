@@ -5,7 +5,6 @@ import (
 	"beel_api/src/db"
 	"beel_api/src/dtos"
 	"beel_api/src/internal/models"
-	"fmt"
 
 	"net/http"
 
@@ -18,11 +17,11 @@ func CreateTask(c *gin.Context) {
 	var task dtos.NewTaskDTO
 
 	claimsRaw, exists := c.Get("claims")
+
 	if !exists {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Unauthorized"})
 		return
 	}
-
 	claims := claimsRaw.(jwt.MapClaims)
 	user_id := claims["user_id"].(string)
 
@@ -37,15 +36,16 @@ func CreateTask(c *gin.Context) {
 	newTask.UserID = uuid.MustParse(user_id)
 	newTask.Status = false
 
-	if task.ListID != "" {
-		parsedID, err := uuid.Parse(task.ListID)
+	list_id := c.Param("id")
+
+	if list_id != "" {
+		parsedID, err := uuid.Parse(list_id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 		newTask.ListID = &parsedID
 	}
-	fmt.Printf("%s", task)
 
 	err := db.DB.Create(&newTask).Error
 	if err != nil {
@@ -55,8 +55,10 @@ func CreateTask(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"task": responses.TaskRes(newTask)})
 	return
 }
+
 func GetTasks(c *gin.Context) {
 	claimsRaw, exists := c.Get("claims")
+	list_id := c.Param("id")
 	if !exists {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Unauthorized"})
 		return
@@ -66,7 +68,7 @@ func GetTasks(c *gin.Context) {
 	user_id := claims["user_id"].(string)
 
 	var tasks []models.Task
-	err := db.DB.Where("user_id = ?", user_id).Find(&tasks).Error
+	err := db.DB.Where("user_id = ? and list_id = ?", user_id, list_id).Find(&tasks).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
