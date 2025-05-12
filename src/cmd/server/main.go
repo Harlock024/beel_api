@@ -4,8 +4,8 @@ import (
 	"beel_api/src/api/middleware"
 	"beel_api/src/api/routes"
 	"beel_api/src/db"
+	"beel_api/src/migrations"
 
-	//"beel_api/src/migrations"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -14,7 +14,7 @@ import (
 
 func main() {
 	db.InitDB()
-	//migrations.Run()
+	migrations.Run()
 	r := gin.Default()
 
 	config := cors.Config{

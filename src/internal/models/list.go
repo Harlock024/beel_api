@@ -8,5 +8,5 @@ type List struct {
 	Color  string    `json:"color" gorm:"not null"`
 	UserID string    `json:"user_id" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
 	User   User      `gorm:"foreignKey:UserID"`
-	Tasks  []Task
+	Tasks  []Task    `gorm:"constraint:OnDelete:CASCADE;"`
 }
