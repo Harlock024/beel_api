@@ -34,7 +34,7 @@ func CreateTask(c *gin.Context) {
 	newTask.ID = uuid.New()
 	newTask.Title = task.Title
 	newTask.UserID = uuid.MustParse(user_id)
-	newTask.Status = false
+	newTask.Status = "todo"
 
 	list_id := c.Param("id")
 

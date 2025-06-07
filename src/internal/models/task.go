@@ -11,7 +11,7 @@ type Task struct {
 	Title       string     `json:"title" gorm:"not null"`
 	Description string     `json:"description"`
 	UserID      uuid.UUID  `json:"user_id" `
-	Status      bool       `json:"status"`
+	Status      string     `json:"status"`
 	DueDate     string     `json:"due_date"`
 	CreatedAt   time.Time  `json:"created_at"`
 	ListID      *uuid.UUID `json:"list_id"`

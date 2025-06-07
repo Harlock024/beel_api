@@ -9,7 +9,7 @@ type TaskResponse struct {
 	Title       string   `json:"title"`
 	Description string   `json:"description"`
 	UserID      string   `json:"user_id"`
-	Status      bool     `json:"status"`
+	Status      string   `json:"status"`
 	ListID      string   `json:"list_id"`
 	Tags        []string `json:"tags"`
 	DueDate     string   `json:"due_date"`
