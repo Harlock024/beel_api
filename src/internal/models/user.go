@@ -8,7 +8,7 @@ type User struct {
 	Email     string    `json:"email" gorm:"unique;not null"`
 	Password  string    `json:"password"`
 	AvatarURL string    `json:"avatar_url"`
-	List      []List    `gorm:"foreignKey:UserID"`
+	Lists     []List    `gorm:"foreignKey:UserID"`
 	Tasks     []Task    `gorm:"foreignKey:UserID"`
 	Tags      []Tag     `gorm:"foreignkey:CreatedBy"`
 }

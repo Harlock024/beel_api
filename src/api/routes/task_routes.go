@@ -6,10 +6,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func TaskRoutes(router *gin.RouterGroup) {
-	router.POST("/lists/:id/tasks", handlers.CreateTask)
-	router.GET("/lists/:id/tasks", handlers.GetTasks)
-	router.GET("/tasks/:id", handlers.GetTask)
-	router.PUT("/tasks/:id", handlers.UpdateTask)
-	router.DELETE("/tasks/:id", handlers.DeleteTask)
+func TaskRoutes(router *gin.RouterGroup, taskHandler *handlers.TaskHandler) {
+	router.POST("/lists/:id/tasks", taskHandler.CreateTask)
+	// router.GET("/lists/:id/tasks", taskHandler.GetTasks)
+	router.GET("/tasks/:id", taskHandler.GetTasks)
+	router.PUT("/tasks/:id", taskHandler.UpdateTask)
+	router.DELETE("/tasks/:id", taskHandler.DeleteTask)
 }
