@@ -43,13 +43,14 @@ func main() {
 		// Initialize repositories and services
 		taskHandler := handlers.NewTaskHandler(services.NewTaskService(repositories.NewTaskRepository(db.DB)))
 		listHandler := handlers.NewListHandler(services.NewListService(*repositories.NewListRepository(db.DB)))
+		tagHandler := handlers.NewTagHandler(services.NewTagService(repositories.NewTagRepository(db.DB)))
 
 		api.Use(middleware.AuthMiddleware())
 		routes.RefreshRoutes(api)
 		routes.TaskRoutes(api, taskHandler)
 
 		routes.ListRoutes(api, listHandler)
-		routes.TagRoutes(api)
+		routes.TagRoutes(api, tagHandler)
 	}
 
 	r.Run("localhost:8080")

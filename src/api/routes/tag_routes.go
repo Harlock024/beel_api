@@ -6,10 +6,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func TagRoutes(router *gin.RouterGroup) {
-	router.POST("/tags", handlers.CreateTag)
-	router.GET("/tags", handlers.GetTags)
-	router.GET("/tags/:id", handlers.GetTag)
-	router.PUT("/tags/:id", handlers.UpdateTag)
-	router.DELETE("/tags/:id", handlers.DeleteTag)
+func TagRoutes(router *gin.RouterGroup, tagHandler *handlers.TagHandler) {
+	router.POST("/tags", tagHandler.CreateTag)
+	router.GET("/tags", tagHandler.GetTags)
+	// router.GET("/tags/:id", tagHandler.GetTag)
+	router.PUT("/tags/:id", tagHandler.UpdateTag)
+	router.DELETE("/tags/:id", tagHandler.DeleteTag)
 }
