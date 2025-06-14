@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"beel_api/src/api/responses"
 	"beel_api/src/dtos"
 	"beel_api/src/internal/services"
 
@@ -35,6 +36,10 @@ func (h *ListHandler) FindListsByUser(c *gin.Context) {
 	listsRes, err := h.service.GetAllListByUserId(uuid.MustParse(user_id))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	if len(listsRes) == 0 {
+		c.JSON(http.StatusOK, gin.H{"lists": []responses.ListResponse{}})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"lists": listsRes})

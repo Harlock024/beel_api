@@ -17,7 +17,7 @@ func NewTaskRepository(db *gorm.DB) *TaskRepository {
 
 func (r *TaskRepository) GetTasksByListId(list_id uuid.UUID) ([]*models.Task, error) {
 	var tasks []*models.Task
-	if err := r.db.Preload("Tags").Where("list_id = ?", list_id).Take(&tasks).Error; err != nil {
+	if err := r.db.Preload("Tags").Where("list_id = ?", list_id).Find(&tasks).Error; err != nil {
 		return nil, err
 	}
 	return tasks, nil

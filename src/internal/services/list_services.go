@@ -24,8 +24,12 @@ func (s *ListService) GetAllListByUserId(user_id uuid.UUID) ([]*responses.ListRe
 	}
 	var listResponses []*responses.ListResponse
 	for _, list := range lists {
-		listResponse := responses.NewListResponse(*list)
+		listResponse := responses.NewListResponse(list)
 		listResponses = append(listResponses, &listResponse)
+	}
+
+	if len(listResponses) == 0 {
+		return listResponses, nil
 	}
 	return listResponses, nil
 }
