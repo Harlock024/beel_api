@@ -40,11 +40,21 @@ func (r *TaskRepository) DeleteTask(task *models.Task) error {
 	}
 	return nil
 }
-
 func (r *TaskRepository) GetTaskById(id uuid.UUID) (*models.Task, error) {
 	var task models.Task
 	if err := r.db.Preload("Tags").Where("id = ?", id).First(&task).Error; err != nil {
 		return nil, err
 	}
 	return &task, nil
+}
+
+func (r *TaskRepository) GetTasksByFilter(start string, end string) ([]*models.Task, error) {
+	var tasks []*models.Task
+	if err := r.db.
+		Preload("Tags").
+		Where("due_date >= ? AND due_date < ?", start, end).
+		Find(&tasks).Error; err != nil {
+		return nil, err
+	}
+	return tasks, nil
 }

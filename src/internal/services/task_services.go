@@ -5,6 +5,7 @@ import (
 	"beel_api/src/dtos"
 	"beel_api/src/internal/models"
 	"beel_api/src/internal/repositories"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -95,4 +96,65 @@ func (s *TaskService) GetTaskById(task_id uuid.UUID) (*responses.TaskResponse, e
 		return nil, err
 	}
 	return responses.NewTaskResponse(existingTask), nil
+}
+
+func (s TaskService) GetTasksByFilter(filter string) ([]*responses.TaskResponse, error) {
+	if filter == "" {
+		return nil, nil
+	}
+
+	loc, _ := time.LoadLocation("America/Mexico_City")
+
+	if filter == "today" {
+		start := time.Now().In(loc).Truncate(24 * time.Hour).UTC()
+		end := start.Add(24 * time.Hour).UTC()
+		tasks, err := s.repo.GetTasksByFilter(start.String(), end.String())
+
+		if err != nil {
+			return nil, err
+		}
+		if len(tasks) == 0 {
+			return nil, nil
+		}
+		var taskResponses []*responses.TaskResponse
+		for _, task := range tasks {
+			taskResponse := responses.NewTaskResponse(task)
+			taskResponses = append(taskResponses, taskResponse)
+		}
+		return taskResponses, nil
+	} else if filter == "upcoming" {
+		start := time.Now().In(loc).Truncate(24 * time.Hour).Add(24 * time.Hour).UTC()
+		end := start.Add(7 * 24 * time.Hour).UTC()
+		tasks, err := s.repo.GetTasksByFilter(start.String(), end.String())
+		if err != nil {
+			return nil, err
+		}
+
+		if len(tasks) == 0 {
+			return nil, nil
+		}
+		var taskResponses []*responses.TaskResponse
+		for _, task := range tasks {
+			taskResponse := responses.NewTaskResponse(task)
+			taskResponses = append(taskResponses, taskResponse)
+		}
+		return taskResponses, nil
+	}
+	// } else if filter == "overdue" {
+	// 	tasks, err := s.repo.GetTasksByFilter("overdue")
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// 	if len(tasks) == 0 {
+	// 		return nil, nil
+	// 	}
+	// 	var taskResponses []*responses.TaskResponse
+	// 	for _, task := range tasks {
+	// 		taskResponse := responses.NewTaskResponse(task)
+	// 		taskResponses = append(taskResponses, taskResponse)
+	// 	}
+	// 	return taskResponses, nil
+	// }
+	return nil, nil
+
 }

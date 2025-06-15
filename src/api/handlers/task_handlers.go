@@ -173,3 +173,18 @@ func (h *TaskHandler) UpdateTask(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"task": taskRes})
 	return
 }
+
+func (h *TaskHandler) GetTasksByFilter(c *gin.Context) {
+	filter := c.Query("filter")
+	if filter == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Filter is required"})
+		return
+	}
+	tasks, err := h.service.GetTasksByFilter(filter)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"tasks": tasks})
+	return
+}
