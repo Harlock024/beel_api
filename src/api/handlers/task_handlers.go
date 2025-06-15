@@ -22,6 +22,8 @@ func NewTaskHandler(service *services.TaskService) *TaskHandler {
 func (h *TaskHandler) CreateTask(c *gin.Context) {
 	var task dtos.NewTaskDTO
 
+	var list_id = c.Param("id")
+
 	if err := c.ShouldBindJSON(&task); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -41,7 +43,7 @@ func (h *TaskHandler) CreateTask(c *gin.Context) {
 		return
 	}
 
-	taskRes, err := h.service.CreateTask(&task)
+	taskRes, err := h.service.CreateTask(&task, uuid.MustParse(list_id), uuid.MustParse(user_id))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -51,7 +53,7 @@ func (h *TaskHandler) CreateTask(c *gin.Context) {
 }
 
 func (h *TaskHandler) GetTasks(c *gin.Context) {
-	listID := c.Param("list_id")
+	listID := c.Param("id")
 	if listID == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "List ID is required"})
 		return

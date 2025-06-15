@@ -31,11 +31,13 @@ func (s *TaskService) GetTasksByListId(listId uuid.UUID) ([]*responses.TaskRespo
 	return taskResponses, nil
 }
 
-func (s *TaskService) CreateTask(task *dtos.NewTaskDTO) (*responses.TaskResponse, error) {
+func (s *TaskService) CreateTask(task *dtos.NewTaskDTO, list_id uuid.UUID, user_id uuid.UUID) (*responses.TaskResponse, error) {
 
 	newTask := &models.Task{
-		ID:    uuid.New(),
-		Title: task.Title,
+		ID:     uuid.New(),
+		Title:  task.Title,
+		ListID: list_id,
+		UserID: user_id,
 	}
 	err := s.repo.CreateTask(newTask)
 	if err != nil {
@@ -50,17 +52,27 @@ func (s *TaskService) UpdateTask(task_id uuid.UUID, task *dtos.UpdateTaskDTO) (*
 	if err != nil {
 		return nil, err
 	}
+	if task.Title != "" {
+		existingTask.Title = task.Title
+	}
+	if task.Description != "" {
+		existingTask.Description = task.Description
+	}
+	if task.Status != "" {
+		existingTask.Status = task.Status
+	}
+	if task.DueDate != "" {
+		existingTask.DueDate = task.DueDate
+	}
 
-	existingTask.Title = task.Title
-	existingTask.Description = task.Description
-	existingTask.Status = task.Status
-	existingTask.DueDate = task.DueDate
+	if task.ListID != nil {
+		existingTask.ListID = *task.ListID
+	}
 
 	err = s.repo.UpdateTask(existingTask)
 	if err != nil {
 		return nil, err
 	}
-
 	return responses.NewTaskResponse(existingTask), nil
 }
 

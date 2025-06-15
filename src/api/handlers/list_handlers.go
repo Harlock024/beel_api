@@ -92,7 +92,7 @@ func (h *ListHandler) UpdateList(c *gin.Context) {
 		return
 	}
 
-	list_id := c.Param("list_id")
+	list_id := c.Param("id")
 	if list_id == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "List ID is required"})
 		return
@@ -128,7 +128,7 @@ func (h *ListHandler) DeleteList(c *gin.Context) {
 		return
 	}
 
-	list_id := c.Param("list_id")
+	list_id := c.Param("id")
 	if list_id == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "List ID is required"})
 		return
