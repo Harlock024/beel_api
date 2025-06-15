@@ -3,6 +3,7 @@ package repositories
 import (
 	"beel_api/src/internal/models"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -18,7 +19,7 @@ func NewUserRepository(db *gorm.DB) *UserRepository {
 	return &UserRepository{db: db}
 }
 
-func (r *UserRepository) GetUserByID(id string) (*models.User, error) {
+func (r *UserRepository) GetUserByID(id uuid.UUID) (*models.User, error) {
 	var user models.User
 	if err := r.db.Omit("Tasks", "Lists", "Tags").Where("id = ?", id).First(&user).Error; err != nil {
 		return nil, err
