@@ -6,9 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func ListRoutes(router *gin.RouterGroup) {
-	router.GET("/lists", handlers.FindListsByUser)
-	router.POST("/lists", handlers.CreateList)
-	router.PUT("/lists/:id", handlers.UpdateList)
-	router.DELETE("/lists/:id", handlers.DeleteList)
+func ListRoutes(router *gin.RouterGroup, listHandler *handlers.ListHandler) {
+	router.GET("/lists", listHandler.FindListsByUser)
+	router.POST("/lists", listHandler.CreateList)
+	router.PUT("/lists/:id", listHandler.UpdateList)
+	router.DELETE("/lists/:id", listHandler.DeleteList)
 }

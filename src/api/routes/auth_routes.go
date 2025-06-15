@@ -6,9 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AuthRoutes(router *gin.RouterGroup) {
-	router.POST("/login", handlers.LoginHandler)
-	router.POST("/register", handlers.RegisterHandler)
-	router.GET("/me", handlers.GetMe)
+func AuthRoutes(router *gin.RouterGroup, authHandler *handlers.AuthHandler) {
+	router.POST("/login", authHandler.LoginHandler)
+	router.POST("/register", authHandler.RegisterHandler)
+	// router.GET("/me", handlers.GetMe)
 
 }
