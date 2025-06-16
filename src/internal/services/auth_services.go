@@ -95,24 +95,3 @@ func (s *AuthService) Login(dto dtos.LoginDTO) (*responses.LoginResponse, error)
 	}
 	return loginResponse, nil
 }
-
-// func (s *AuthService) Login(dto dtos.LoginDTO) (*responses.LoginResponse, error) {
-// 	if dto.Email == "" || dto.Password == "" {
-// 		return nil, errors.New("email and password are required")
-// 	}
-// 	user, err := s.repo.GetUserByEmail(dto.Email)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	compare := utils.ComparePassword(user.Password, dto.Password)
-// 	if !compare {
-// 		return nil, errors.New("invalid email or password")
-// 	}
-
-// 	accessToken, refreshToken, err := utils.GenerateTokens(user.Username, user.ID)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return nil,
-// }

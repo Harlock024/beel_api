@@ -5,6 +5,7 @@ import (
 	"beel_api/src/db"
 	"beel_api/src/dtos"
 	"beel_api/src/internal/models"
+	"beel_api/src/internal/services"
 	"beel_api/src/pkg/utils"
 	"net/http"
 	"time"
@@ -12,6 +13,25 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
+
+type RefreshHandler struct {
+	service *services.RefreshServices
+}
+
+func NewRefreshHandler(service *services.RefreshServices) *RefreshHandler {
+	return &RefreshHandler{service: service}
+}
+
+func (h *RefreshHandler) RefreshToken(c *gin.Context) {
+	var refresh_token dtos.RefreshRequest
+
+	if err := c.ShouldBindJSON(&refresh_token); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"erro": "Invalid refresh token payload"})
+	}
+
+	h.service.Refresh(refresh_token)
+
+}
 
 func RefreshTokenHandler(c *gin.Context) {
 	var refresh_token dtos.RefreshRequest

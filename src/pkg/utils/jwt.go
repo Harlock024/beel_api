@@ -8,8 +8,13 @@ import (
 	"github.com/google/uuid"
 )
 
-var refreshSecretKey = []byte(os.Getenv("REFRESH_SECRET_KEY"))
-var accessSecretKey = []byte(os.Getenv("ACCESS_SECRET_KEY"))
+func GetAccessSecretKey() []byte {
+	return []byte(os.Getenv("ACCESS_SECRET_KEY"))
+}
+
+func GetRefreshSecretKey() []byte {
+	return []byte(os.Getenv("REFRESH_SECRET_KEY"))
+}
 
 func GenerateTokens(username string, userId uuid.UUID) (string, string, error) {
 	accessToken, err := CreateAccessToken(username, userId)
@@ -30,7 +35,7 @@ func CreateRefreshToken(username string, userId uuid.UUID) (string, error) {
 			"username": username,
 			"exp":      time.Now().Add(time.Hour * 24 * 30).Unix(),
 		})
-	tokenString, err := token.SignedString(refreshSecretKey)
+	tokenString, err := token.SignedString(GetRefreshSecretKey())
 	if err != nil {
 		return "", err
 	}
@@ -44,7 +49,7 @@ func CreateAccessToken(username string, userId uuid.UUID) (string, error) {
 			"username": username,
 			"exp":      time.Now().Add(time.Hour * 24).Unix(),
 		})
-	tokenString, err := token.SignedString(accessSecretKey)
+	tokenString, err := token.SignedString(GetAccessSecretKey())
 	if err != nil {
 		return "", err
 	}

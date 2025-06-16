@@ -28,7 +28,6 @@ func (s *RefreshServices) Refresh(dto dtos.RefreshRequest) (*responses.LoginResp
 	if refreshToken == nil {
 		return nil, err
 	}
-
 	// Delete the old refresh token
 	if err := s.refreshRepo.DeleteRefreshToken(refreshToken); err != nil {
 		return nil, err
@@ -46,7 +45,6 @@ func (s *RefreshServices) Refresh(dto dtos.RefreshRequest) (*responses.LoginResp
 		return nil, err
 	}
 
-	// Create a new refresh token record
 	return &responses.LoginResponse{
 		AccessToken:  access,
 		RefreshToken: refresh,

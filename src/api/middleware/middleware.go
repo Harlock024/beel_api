@@ -1,50 +1,45 @@
 package middleware
 
 import (
+	"beel_api/src/pkg/utils"
+	"fmt"
 	"net/http"
-	"os"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var secretKey = os.Getenv("JWT_SECRET")
-
 func AuthMiddleware() gin.HandlerFunc {
+
 	return func(c *gin.Context) {
-		auth := c.GetHeader("Authorization")
-
-		if auth == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized, token"})
+		tokenString, err := c.Cookie("access_token")
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Token not found"})
+			return
+		}
+		if tokenString == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized, token empty"})
 			c.Abort()
 			return
 		}
 
-		fields := strings.Fields(auth)
-		if len(fields) != 2 || strings.ToLower(fields[0]) != "bearer" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid authorization format"})
-			c.Abort()
-			return
-		}
-
-		tokenString := fields[1]
-
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, http.ErrAbortHandler
 			}
-			return []byte(secretKey), nil
+			return utils.GetAccessSecretKey(), nil
 		})
 
 		if err != nil || !token.Valid {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized, expired or invalid token"})
 			c.Abort()
+			fmt.Println("secret key ", utils.GetAccessSecretKey())
+			fmt.Println("Error parsing token:", err)
 			return
 		}
+
 		if claims, ok := token.Claims.(jwt.MapClaims); ok {
 			c.Set("claims", claims)
-
 			c.Next()
 		} else {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})

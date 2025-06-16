@@ -4,6 +4,7 @@ import (
 	"beel_api/src/api/responses"
 	"beel_api/src/dtos"
 	"beel_api/src/internal/services"
+	"fmt"
 
 	"net/http"
 
@@ -19,6 +20,7 @@ type ListHandler struct {
 func NewListHandler(service *services.ListService) *ListHandler {
 	return &ListHandler{service: service}
 }
+
 func (h *ListHandler) FindListsByUser(c *gin.Context) {
 	claimsRaw, exists := c.Get("claims")
 	if !exists {
@@ -44,7 +46,6 @@ func (h *ListHandler) FindListsByUser(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"lists": listsRes})
 	return
-
 }
 
 func (h *ListHandler) CreateList(c *gin.Context) {
@@ -56,6 +57,8 @@ func (h *ListHandler) CreateList(c *gin.Context) {
 
 	claims := claimsRaw.(jwt.MapClaims)
 	user_id := claims["user_id"].(string)
+
+	fmt.Println("User ID from claims:", user_id)
 
 	var list *dtos.ListDTO
 	if err := c.BindJSON(&list); err != nil {
