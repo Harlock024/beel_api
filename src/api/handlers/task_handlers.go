@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"beel_api/src/api/responses"
 	"beel_api/src/dtos"
 	"beel_api/src/internal/services"
+	"fmt"
 
 	"net/http"
 
@@ -180,9 +182,15 @@ func (h *TaskHandler) GetTasksByFilter(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Filter is required"})
 		return
 	}
+	fmt.Println("Filter:", filter)
+
 	tasks, err := h.service.GetTasksByFilter(filter)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	if len(tasks) == 0 {
+		c.JSON(http.StatusOK, gin.H{"tasks": []responses.TaskResponses{}})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"tasks": tasks})

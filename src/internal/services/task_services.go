@@ -106,13 +106,14 @@ func (s TaskService) GetTasksByFilter(filter string) ([]*responses.TaskResponse,
 	loc, _ := time.LoadLocation("America/Mexico_City")
 
 	if filter == "today" {
-		start := time.Now().In(loc).Truncate(24 * time.Hour).UTC()
+		now := time.Now().In(loc)
+		start := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, loc).UTC()
 		end := start.Add(24 * time.Hour).UTC()
 		tasks, err := s.repo.GetTasksByFilter(start.String(), end.String())
-
 		if err != nil {
 			return nil, err
 		}
+
 		if len(tasks) == 0 {
 			return nil, nil
 		}
@@ -121,6 +122,7 @@ func (s TaskService) GetTasksByFilter(filter string) ([]*responses.TaskResponse,
 			taskResponse := responses.NewTaskResponse(task)
 			taskResponses = append(taskResponses, taskResponse)
 		}
+
 		return taskResponses, nil
 	} else if filter == "upcoming" {
 		start := time.Now().In(loc).Truncate(24 * time.Hour).Add(24 * time.Hour).UTC()
