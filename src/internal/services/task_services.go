@@ -65,18 +65,18 @@ func (s *TaskService) UpdateTask(task_id uuid.UUID, task *dtos.UpdateTaskDTO) (*
 	if task.DueDate != "" {
 		existingTask.DueDate = task.DueDate
 	}
-
 	if task.ListID != nil {
 		existingTask.ListID = *task.ListID
 	}
-
+	if task.IsCompleted {
+		existingTask.IsCompleted = task.IsCompleted
+	}
 	err = s.repo.UpdateTask(existingTask)
 	if err != nil {
 		return nil, err
 	}
 	return responses.NewTaskResponse(existingTask), nil
 }
-
 func (s *TaskService) DeleteTask(task_id uuid.UUID) error {
 
 	existingTask, err := s.repo.GetTaskById(task_id)

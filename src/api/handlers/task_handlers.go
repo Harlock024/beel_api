@@ -137,7 +137,7 @@ func (h *TaskHandler) DeleteTask(c *gin.Context) {
 
 	h.service.DeleteTask(uuid.MustParse(taskID))
 
-	c.JSON(http.StatusOK, gin.H{"message": "Task deleted successfully"})
+	c.JSON(http.StatusNoContent, gin.H{"message": "Task deleted successfully"})
 	return
 }
 func (h *TaskHandler) UpdateTask(c *gin.Context) {

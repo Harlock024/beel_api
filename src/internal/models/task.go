@@ -12,10 +12,10 @@ type Task struct {
 	Description string    `json:"description"`
 	UserID      uuid.UUID `json:"user_id" `
 	Status      string    `json:"status"`
+	IsCompleted bool      `json:"is_completed" gorm:"default:false"`
 	DueDate     string    `json:"due_date"`
 	CreatedAt   time.Time `json:"created_at"`
 	ListID      uuid.UUID `json:"list_id"`
 	List        *List     `gorm:"foreignKey:ListID"`
-
-	Tags []Tag `gorm:"many2many:task_tags;"`
+	Tags        []Tag     `gorm:"many2many:task_tags;"`
 }

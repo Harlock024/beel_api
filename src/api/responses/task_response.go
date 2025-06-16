@@ -13,6 +13,7 @@ type TaskResponse struct {
 	UserID      uuid.UUID `json:"user_id"`
 	Status      string    `json:"status"`
 	ListID      uuid.UUID `json:"list_id"`
+	IsCompleted bool      `json:"is_completed"`
 	Tags        []string  `json:"tags"`
 	DueDate     string    `json:"due_date"`
 }
@@ -27,6 +28,7 @@ func NewTaskResponse(task *models.Task) *TaskResponse {
 	taskResponse.UserID = task.UserID
 	taskResponse.Status = task.Status
 	taskResponse.DueDate = task.DueDate
+	taskResponse.IsCompleted = task.IsCompleted
 
 	if task.ListID != uuid.Nil {
 		taskResponse.ListID = task.ListID
@@ -34,5 +36,6 @@ func NewTaskResponse(task *models.Task) *TaskResponse {
 	} else {
 		taskResponse.ListID = uuid.Nil
 	}
+
 	return &taskResponse
 }
