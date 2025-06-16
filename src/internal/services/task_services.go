@@ -29,6 +29,9 @@ func (s *TaskService) GetTasksByListId(listId uuid.UUID) ([]*responses.TaskRespo
 		taskResponse := responses.NewTaskResponse(task)
 		taskResponses = append(taskResponses, taskResponse)
 	}
+	if len(taskResponses) == 0 {
+		return []*responses.TaskResponse{}, nil
+	}
 	return taskResponses, nil
 }
 
