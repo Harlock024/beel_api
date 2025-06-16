@@ -44,11 +44,12 @@ func main() {
 		taskHandler := handlers.NewTaskHandler(services.NewTaskService(repositories.NewTaskRepository(db.DB)))
 		listHandler := handlers.NewListHandler(services.NewListService(*repositories.NewListRepository(db.DB)))
 		tagHandler := handlers.NewTagHandler(services.NewTagService(repositories.NewTagRepository(db.DB)))
-
+		refreshHandler := handlers.NewRefreshHandler(services.NewRefreshServices(repositories.NewRefreshRepository(db.DB), repositories.NewUserRepository(db.DB)))
+		// Apply authentication middleware
 		api.Use(middleware.AuthMiddleware())
-		routes.RefreshRoutes(api)
-		routes.TaskRoutes(api, taskHandler)
 
+		routes.RefreshRoutes(api, refreshHandler)
+		routes.TaskRoutes(api, taskHandler)
 		routes.ListRoutes(api, listHandler)
 		routes.TagRoutes(api, tagHandler)
 	}

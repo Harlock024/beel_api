@@ -6,6 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RefreshRoutes(router *gin.RouterGroup) {
-	router.POST("/refresh", handlers.RefreshTokenHandler)
+func RefreshRoutes(router *gin.RouterGroup, refreshHandler *handlers.RefreshHandler) {
+	router.POST("/refresh", refreshHandler.RefreshToken)
 }
