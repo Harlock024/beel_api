@@ -37,9 +37,9 @@ func (h *AuthHandler) RegisterHandler(c *gin.Context) {
 	}
 	secure := gin.Mode() == gin.ReleaseMode
 	c.SetCookie("access_token", resposense.AccessToken, 3600, "/", "localhost", secure, true)
+	c.SetCookie("refresh_token", resposense.RefreshToken, 3600*24*30, "/", "localhost", secure, true)
 
 	c.JSON(http.StatusOK, gin.H{
-		"refresh_token": resposense.RefreshToken,
 		"user": responses.UserResponse{
 			ID:        resposense.User.ID,
 			Username:  resposense.User.Username,

@@ -2,7 +2,6 @@ package services
 
 import (
 	"beel_api/src/api/responses"
-	"beel_api/src/dtos"
 	"beel_api/src/internal/repositories"
 	"beel_api/src/pkg/utils"
 )
@@ -19,8 +18,8 @@ func NewRefreshServices(repo *repositories.RefreshRepository, userRepo *reposito
 	}
 }
 
-func (s *RefreshServices) Refresh(dto dtos.RefreshRequest) (*responses.LoginResponse, error) {
-	refreshToken, err := s.refreshRepo.FindByRefreshToken(dto.RefreshToken)
+func (s *RefreshServices) Refresh(refresh_token string) (*responses.LoginResponse, error) {
+	refreshToken, err := s.refreshRepo.FindByRefreshToken(utils.HashToken(refresh_token))
 	if err != nil {
 		return nil, err
 	}
