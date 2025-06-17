@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"beel_api/src/pkg/utils"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -33,8 +32,6 @@ func AuthMiddleware() gin.HandlerFunc {
 		if err != nil || !token.Valid {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized, expired or invalid token"})
 			c.Abort()
-			fmt.Println("secret key ", utils.GetAccessSecretKey())
-			fmt.Println("Error parsing token:", err)
 			return
 		}
 

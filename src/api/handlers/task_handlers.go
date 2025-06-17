@@ -4,7 +4,6 @@ import (
 	"beel_api/src/api/responses"
 	"beel_api/src/dtos"
 	"beel_api/src/internal/services"
-	"fmt"
 
 	"net/http"
 
@@ -182,7 +181,6 @@ func (h *TaskHandler) GetTasksByFilter(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Filter is required"})
 		return
 	}
-	fmt.Println("Filter:", filter)
 
 	tasks, err := h.service.GetTasksByFilter(filter)
 	if err != nil {

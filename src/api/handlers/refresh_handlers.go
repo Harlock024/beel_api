@@ -29,10 +29,13 @@ func (h *RefreshHandler) RefreshToken(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to refresh token"})
 		return
 	}
+	if resposense == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid refresh token"})
+		return
+	}
 
-	secure := gin.Mode() == gin.ReleaseMode
-	c.SetCookie("access_token", resposense.AccessToken, 3600, "/", "localhost", secure, true)
-	c.SetCookie("refresh_token", resposense.RefreshToken, 3600*24*7, "/", "localhost", secure, true)
+	c.SetCookie("access_token", resposense.AccessToken, 3600, "/", "localhost", false, true)
+	c.SetCookie("refresh_token", resposense.RefreshToken, 3600*24*7, "/", "localhost", false, true)
 
 	c.JSON(http.StatusOK, gin.H{
 		"user": responses.UserResponse{

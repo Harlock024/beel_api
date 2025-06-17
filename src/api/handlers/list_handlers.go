@@ -4,7 +4,6 @@ import (
 	"beel_api/src/api/responses"
 	"beel_api/src/dtos"
 	"beel_api/src/internal/services"
-	"fmt"
 
 	"net/http"
 
@@ -57,8 +56,6 @@ func (h *ListHandler) CreateList(c *gin.Context) {
 
 	claims := claimsRaw.(jwt.MapClaims)
 	user_id := claims["user_id"].(string)
-
-	fmt.Println("User ID from claims:", user_id)
 
 	var list *dtos.ListDTO
 	if err := c.BindJSON(&list); err != nil {

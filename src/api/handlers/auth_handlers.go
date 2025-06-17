@@ -30,21 +30,26 @@ func (h *AuthHandler) RegisterHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "JSON Invalido"})
 		return
 	}
-	resposense, err := h.service.Register(user)
+	response, err := h.service.Register(user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	secure := gin.Mode() == gin.ReleaseMode
-	c.SetCookie("access_token", resposense.AccessToken, 3600, "/", "localhost", secure, true)
-	c.SetCookie("refresh_token", resposense.RefreshToken, 3600*24*30, "/", "localhost", secure, true)
+
+	if response == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate tokens"})
+		return
+	}
+
+	c.SetCookie("access_token", response.AccessToken, 3600, "/", "localhost", false, true)
+	c.SetCookie("refresh_token", response.RefreshToken, 3600*24*30, "/", "localhost", false, true)
 
 	c.JSON(http.StatusOK, gin.H{
 		"user": responses.UserResponse{
-			ID:        resposense.User.ID,
-			Username:  resposense.User.Username,
-			Email:     resposense.User.Email,
-			AvatarURL: resposense.User.AvatarURL,
+			ID:        response.User.ID,
+			Username:  response.User.Username,
+			Email:     response.User.Email,
+			AvatarURL: response.User.AvatarURL,
 		},
 	})
 	return
@@ -76,12 +81,14 @@ func (h *AuthHandler) LoginHandler(c *gin.Context) {
 	}
 	// Set the access token as a cookie
 	// localhost is used for testing purposes
-	//
-	secure := gin.Mode() == gin.ReleaseMode
-	c.SetCookie("access_token", resposense.AccessToken, 3600, "/", "localhost", secure, true)
 
+	if resposense == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate tokens"})
+		return
+	}
+	c.SetCookie("access_token", resposense.AccessToken, 3600, "/", "localhost", false, true)
+	c.SetCookie("refresh_token", resposense.RefreshToken, 3600*24*30, "/", "localhost", false, true)
 	c.JSON(http.StatusOK, gin.H{
-		"refresh_token": resposense.RefreshToken,
 		"user": responses.UserResponse{
 			ID:        resposense.User.ID,
 			Username:  resposense.User.Username,
