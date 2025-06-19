@@ -7,6 +7,7 @@ import (
 	"beel_api/src/db"
 	"beel_api/src/internal/repositories"
 	"beel_api/src/internal/services"
+	"os"
 
 	"time"
 
@@ -51,5 +52,10 @@ func main() {
 		routes.TagRoutes(api, tagHandler)
 	}
 
-	r.Run("localhost:8080")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	r.Run(":" + port)
 }
