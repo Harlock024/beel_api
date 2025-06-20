@@ -81,8 +81,29 @@ func (h *AuthHandler) LoginHandler(c *gin.Context) {
 	}
 
 	secure := gin.Mode() == gin.ReleaseMode
-	c.SetCookie("access_token", resposense.AccessToken, 3600, "/", "", secure, true)
-	c.SetCookie("refresh_token", resposense.RefreshToken, 3600*24*30, "/", "", secure, true)
+
+	accessCookie := &http.Cookie{
+		Name:     "access_token",
+		Value:    resposense.AccessToken,
+		Path:     "/",
+		Domain:   "beelweb.vercel.app",
+		MaxAge:   3600,
+		Secure:   secure,
+		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+	}
+	http.SetCookie(c.Writer, accessCookie)
+	refreshCookie := &http.Cookie{
+		Name:     "refresh_token",
+		Value:    resposense.RefreshToken,
+		Path:     "/",
+		Domain:   "beelweb.vercel.app",
+		MaxAge:   3600 * 24 * 30,
+		Secure:   secure,
+		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+	}
+	http.SetCookie(c.Writer, refreshCookie)
 
 	c.JSON(http.StatusOK, gin.H{
 		"user": responses.UserResponse{
