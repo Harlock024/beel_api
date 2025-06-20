@@ -36,8 +36,8 @@ func (h *AuthHandler) RegisterHandler(c *gin.Context) {
 		return
 	}
 	secure := gin.Mode() == gin.ReleaseMode
-	c.SetCookie("access_token", resposense.AccessToken, 3600, "/", "localhost", secure, true)
-	c.SetCookie("refresh_token", resposense.RefreshToken, 3600*24*30, "/", "localhost", secure, true)
+	c.SetCookie("access_token", resposense.AccessToken, 3600, "/", "", secure, true)
+	c.SetCookie("refresh_token", resposense.RefreshToken, 3600*24*30, "/", "", secure, true)
 
 	c.JSON(http.StatusOK, gin.H{
 		"user": responses.UserResponse{
@@ -76,10 +76,10 @@ func (h *AuthHandler) LoginHandler(c *gin.Context) {
 	}
 	// Set the access token as a cookie
 	// localhost is used for testing purposes
-	//
+
 	secure := gin.Mode() == gin.ReleaseMode
-	c.SetCookie("access_token", resposense.AccessToken, 3600, "/", "localhost", secure, true)
-	c.SetCookie("refresh_token", resposense.RefreshToken, 3600*24*30, "/", "localhost", secure, true)
+	c.SetCookie("access_token", resposense.AccessToken, 3600, "/", "", secure, true)
+	c.SetCookie("refresh_token", resposense.RefreshToken, 3600*24*30, "/", "", secure, true)
 
 	c.JSON(http.StatusOK, gin.H{
 		"user": responses.UserResponse{

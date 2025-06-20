@@ -42,7 +42,7 @@ func main() {
 	{
 		// Initialize repositories and services
 		taskHandler := handlers.NewTaskHandler(services.NewTaskService(repositories.NewTaskRepository(db.DB)))
-		listHandler := handlers.NewListHandler(services.NewListService(*repositories.NewListRepository(db.DB)))
+		listHandler := handlers.NewListHandler(services.NewListService(repositories.NewListRepository(db.DB)))
 		tagHandler := handlers.NewTagHandler(services.NewTagService(repositories.NewTagRepository(db.DB)))
 		// Apply authentication middleware
 		api.Use(middleware.AuthMiddleware())
