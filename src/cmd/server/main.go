@@ -17,7 +17,7 @@ import (
 
 func main() {
 	db.InitDB()
-	//migrations.Run()
+
 	r := gin.Default()
 
 	config := cors.Config{
@@ -40,11 +40,9 @@ func main() {
 	}
 	api := r.Group("/api")
 	{
-		// Initialize repositories and services
 		taskHandler := handlers.NewTaskHandler(services.NewTaskService(repositories.NewTaskRepository(db.DB)))
 		listHandler := handlers.NewListHandler(services.NewListService(repositories.NewListRepository(db.DB)))
 		tagHandler := handlers.NewTagHandler(services.NewTagService(repositories.NewTagRepository(db.DB)))
-		// Apply authentication middleware
 		api.Use(middleware.AuthMiddleware())
 
 		routes.TaskRoutes(api, taskHandler)
