@@ -17,7 +17,7 @@ import (
 
 func main() {
 	db.InitDB()
-
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 
 	config := cors.Config{

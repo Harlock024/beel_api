@@ -74,19 +74,16 @@ func (h *AuthHandler) LoginHandler(c *gin.Context) {
 		}
 		return
 	}
-	// Set the access token as a cookie
-	// localhost is used for testing purposes
-
-	secure := gin.Mode() == gin.ReleaseMode
-	c.SetCookie("access_token", resposense.AccessToken, 3600, "/", "", secure, true)
-	c.SetCookie("refresh_token", resposense.RefreshToken, 3600*24*30, "/", "", secure, true)
 
 	if resposense == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate tokens"})
 		return
 	}
-	c.SetCookie("access_token", resposense.AccessToken, 3600, "/", "localhost", false, true)
-	c.SetCookie("refresh_token", resposense.RefreshToken, 3600*24*30, "/", "localhost", false, true)
+
+	secure := gin.Mode() == gin.ReleaseMode
+	c.SetCookie("access_token", resposense.AccessToken, 3600, "/", "", secure, true)
+	c.SetCookie("refresh_token", resposense.RefreshToken, 3600*24*30, "/", "", secure, true)
+
 	c.JSON(http.StatusOK, gin.H{
 		"user": responses.UserResponse{
 			ID:        resposense.User.ID,
