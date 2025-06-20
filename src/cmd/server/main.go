@@ -17,13 +17,13 @@ import (
 
 func main() {
 	db.InitDB()
-	//	migrations.Run()
+	//migrations.Run()
 	r := gin.Default()
 
 	config := cors.Config{
 		AllowOrigins:     []string{"http://localhost:4321"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		AllowHeaders:     []string{"Origin", "Content-Type"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,

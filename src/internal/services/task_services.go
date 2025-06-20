@@ -101,7 +101,7 @@ func (s *TaskService) GetTaskById(task_id uuid.UUID) (*responses.TaskResponse, e
 	return responses.NewTaskResponse(existingTask), nil
 }
 
-func (s TaskService) GetTasksByFilter(filter string) ([]*responses.TaskResponse, error) {
+func (s TaskService) GetTasksByFilter(filter string, user_id uuid.UUID) ([]*responses.TaskResponse, error) {
 	if filter == "" {
 		return nil, nil
 	}
@@ -112,7 +112,7 @@ func (s TaskService) GetTasksByFilter(filter string) ([]*responses.TaskResponse,
 		now := time.Now().In(loc)
 		start := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, loc).UTC()
 		end := start.Add(24 * time.Hour).UTC()
-		tasks, err := s.repo.GetTasksByFilter(start.String(), end.String())
+		tasks, err := s.repo.GetTasksByFilter(start.String(), end.String(), user_id)
 		if err != nil {
 			return nil, err
 		}
@@ -130,7 +130,7 @@ func (s TaskService) GetTasksByFilter(filter string) ([]*responses.TaskResponse,
 	} else if filter == "upcoming" {
 		start := time.Now().In(loc).Truncate(24 * time.Hour).Add(24 * time.Hour).UTC()
 		end := start.Add(7 * 24 * time.Hour).UTC()
-		tasks, err := s.repo.GetTasksByFilter(start.String(), end.String())
+		tasks, err := s.repo.GetTasksByFilter(start.String(), end.String(), user_id)
 		if err != nil {
 			return nil, err
 		}

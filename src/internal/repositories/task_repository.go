@@ -48,11 +48,11 @@ func (r *TaskRepository) GetTaskById(id uuid.UUID) (*models.Task, error) {
 	return &task, nil
 }
 
-func (r *TaskRepository) GetTasksByFilter(start string, end string) ([]*models.Task, error) {
+func (r *TaskRepository) GetTasksByFilter(start string, end string, user_id uuid.UUID) ([]*models.Task, error) {
 	var tasks []*models.Task
 	if err := r.db.
 		Preload("Tags").
-		Where("due_date >= ? AND due_date < ?", start, end).
+		Where(" user_id = ?  due_date >= ? AND due_date < ?", user_id, start, end).
 		Find(&tasks).Error; err != nil {
 		return nil, err
 	}

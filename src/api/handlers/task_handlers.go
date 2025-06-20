@@ -182,7 +182,20 @@ func (h *TaskHandler) GetTasksByFilter(c *gin.Context) {
 		return
 	}
 
-	tasks, err := h.service.GetTasksByFilter(filter)
+	claimsRaw, exists := c.Get("claims")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Unauthorized"})
+		return
+	}
+	claims := claimsRaw.(jwt.MapClaims)
+	user_id := claims["user_id"].(string)
+
+	if user_id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User ID is required"})
+		return
+	}
+
+	tasks, err := h.service.GetTasksByFilter(filter, uuid.MustParse(user_id))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
