@@ -35,14 +35,9 @@ func (h *AuthHandler) RegisterHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
-	if response == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate tokens"})
-		return
-	}
-
-	c.SetCookie("access_token", response.AccessToken, 3600, "/", "localhost", false, true)
-	c.SetCookie("refresh_token", response.RefreshToken, 3600*24*30, "/", "localhost", false, true)
+	secure := gin.Mode() == gin.ReleaseMode
+	c.SetCookie("access_token", response.AccessToken, 3600, "/", "", secure, true)
+	c.SetCookie("refresh_token", response.RefreshToken, 3600*24*30, "/", "", secure, true)
 
 	c.JSON(http.StatusOK, gin.H{
 		"user": responses.UserResponse{
