@@ -83,10 +83,10 @@ func (h *AuthHandler) LoginHandler(c *gin.Context) {
 	secure := gin.Mode() == gin.ReleaseMode
 
 	accessCookie := &http.Cookie{
-		Name:     "access_token",
-		Value:    resposense.AccessToken,
-		Path:     "/",
-		Domain:   ".vercel.app",
+		Name:  "access_token",
+		Value: resposense.AccessToken,
+		Path:  "/",
+
 		MaxAge:   3600,
 		Secure:   secure,
 		HttpOnly: true,
@@ -97,7 +97,6 @@ func (h *AuthHandler) LoginHandler(c *gin.Context) {
 		Name:     "refresh_token",
 		Value:    resposense.RefreshToken,
 		Path:     "/",
-		Domain:   ".vercel.app",
 		MaxAge:   3600 * 24 * 30,
 		Secure:   secure,
 		HttpOnly: true,
