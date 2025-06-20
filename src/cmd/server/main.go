@@ -7,9 +7,7 @@ import (
 	"beel_api/src/db"
 	"beel_api/src/internal/repositories"
 	"beel_api/src/internal/services"
-	"beel_api/src/migrations"
-
-	//	"beel_api/src/migrations"
+	"os"
 
 	"time"
 
@@ -19,7 +17,7 @@ import (
 
 func main() {
 	db.InitDB()
-	migrations.Run()
+	//	migrations.Run()
 	r := gin.Default()
 
 	config := cors.Config{
@@ -44,7 +42,7 @@ func main() {
 	{
 		// Initialize repositories and services
 		taskHandler := handlers.NewTaskHandler(services.NewTaskService(repositories.NewTaskRepository(db.DB)))
-		listHandler := handlers.NewListHandler(services.NewListService(*repositories.NewListRepository(db.DB)))
+		listHandler := handlers.NewListHandler(services.NewListService(repositories.NewListRepository(db.DB)))
 		tagHandler := handlers.NewTagHandler(services.NewTagService(repositories.NewTagRepository(db.DB)))
 		// Apply authentication middleware
 		api.Use(middleware.AuthMiddleware())
@@ -54,5 +52,10 @@ func main() {
 		routes.TagRoutes(api, tagHandler)
 	}
 
-	r.Run("localhost:8080")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	r.Run(":" + port)
 }
