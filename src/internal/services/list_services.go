@@ -34,13 +34,14 @@ func (s *ListService) GetAllListByUserId(user_id uuid.UUID) ([]*responses.ListRe
 	return listResponses, nil
 }
 
-func (s *ListService) GetListById(list_id uuid.UUID) (*responses.ListResponse, error) {
-	list, err := s.repo.GetListById(list_id)
+func (s *ListService) GetListById(list_id uuid.UUID, user_id uuid.UUID) (*responses.ListResponse, error) {
+	list, err := s.repo.GetListById(list_id, user_id)
 	if err != nil {
 		return nil, err
 	}
 	listResponse := responses.NewListResponse(*list)
 	return &listResponse, nil
+
 }
 
 func (s *ListService) CreateList(list *dtos.ListDTO, user_id uuid.UUID) (*responses.ListResponse, error) {
@@ -57,8 +58,8 @@ func (s *ListService) CreateList(list *dtos.ListDTO, user_id uuid.UUID) (*respon
 	return &listResponse, nil
 }
 
-func (s *ListService) UpdateList(list_id uuid.UUID, list dtos.ListDTO) (*responses.ListResponse, error) {
-	existingList, err := s.repo.GetListById(list_id)
+func (s *ListService) UpdateList(list_id uuid.UUID, list dtos.ListDTO, user_id uuid.UUID) (*responses.ListResponse, error) {
+	existingList, err := s.repo.GetListById(list_id, user_id)
 	if err != nil {
 		return nil, err
 	}

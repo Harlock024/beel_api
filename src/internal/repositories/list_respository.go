@@ -23,13 +23,14 @@ func (r *ListRepository) GetAllListByUserId(user_id uuid.UUID) ([]models.List, e
 	return lists, nil
 }
 
-func (r *ListRepository) GetListById(list_id uuid.UUID) (*models.List, error) {
+func (r *ListRepository) GetListById(list_id uuid.UUID, user_id uuid.UUID) (*models.List, error) {
 	var list models.List
-	if err := r.db.Where("id = ?", list_id).Take(&list).Error; err != nil {
+	if err := r.db.Where("id = ? AND user_id = ?", list_id, user_id).Take(&list).Error; err != nil {
 		return nil, err
 	}
 	return &list, nil
 }
+
 func (r *ListRepository) CreateList(list *models.List) (*models.List, error) {
 	if err := r.db.Create(list).Error; err != nil {
 		return nil, err

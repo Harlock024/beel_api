@@ -35,11 +35,10 @@ func (h *AuthHandler) RegisterHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	secure := gin.Mode() == gin.ReleaseMode
-	c.SetCookie("access_token", response.AccessToken, 3600, "/", "", secure, true)
-	c.SetCookie("refresh_token", response.RefreshToken, 3600*24*30, "/", "", secure, true)
 
 	c.JSON(http.StatusOK, gin.H{
+		"access_token":  response.AccessToken,
+		"refresh_token": response.RefreshToken,
 		"user": responses.UserResponse{
 			ID:        response.User.ID,
 			Username:  response.User.Username,
@@ -61,7 +60,7 @@ func (h *AuthHandler) LoginHandler(c *gin.Context) {
 		return
 	}
 
-	resposense, err := h.service.Login(login)
+	response, err := h.service.Login(login)
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -74,25 +73,14 @@ func (h *AuthHandler) LoginHandler(c *gin.Context) {
 		}
 		return
 	}
-	// Set the access token as a cookie
-	// localhost is used for testing purposes
-
-	secure := gin.Mode() == gin.ReleaseMode
-	c.SetCookie("access_token", resposense.AccessToken, 3600, "/", "", secure, true)
-	c.SetCookie("refresh_token", resposense.RefreshToken, 3600*24*30, "/", "", secure, true)
-
-	if resposense == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate tokens"})
-		return
-	}
-	c.SetCookie("access_token", resposense.AccessToken, 3600, "/", "localhost", false, true)
-	c.SetCookie("refresh_token", resposense.RefreshToken, 3600*24*30, "/", "localhost", false, true)
 	c.JSON(http.StatusOK, gin.H{
+		"access_token":  response.AccessToken,
+		"refresh_token": response.RefreshToken,
 		"user": responses.UserResponse{
-			ID:        resposense.User.ID,
-			Username:  resposense.User.Username,
-			Email:     resposense.User.Email,
-			AvatarURL: resposense.User.AvatarURL,
+			ID:        response.User.ID,
+			Username:  response.User.Username,
+			Email:     response.User.Email,
+			AvatarURL: response.User.AvatarURL,
 		},
 	})
 	return
