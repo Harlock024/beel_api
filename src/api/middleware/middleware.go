@@ -4,6 +4,7 @@ import (
 	"beel_api/src/pkg/utils"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -39,9 +40,20 @@ func AuthMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+
+		if claims, ok := token.Claims.(jwt.MapClaims); !ok {
+			if exp, ok := claims["exp"].(float64); ok {
+				if int64(exp) < time.Now().Unix() {
+					c.JSON(http.StatusUnauthorized, gin.H{"error": "Token expired"})
+					c.Abort()
+					return
+				}
+			}
+		}
 		if claims, ok := token.Claims.(jwt.MapClaims); ok {
 			c.Set("claims", claims)
 			c.Next()
+
 		} else {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
 			c.Abort()

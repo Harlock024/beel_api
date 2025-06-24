@@ -2,8 +2,11 @@ package services
 
 import (
 	"beel_api/src/api/responses"
+	"beel_api/src/internal/models"
 	"beel_api/src/internal/repositories"
 	"beel_api/src/pkg/utils"
+
+	"github.com/google/uuid"
 )
 
 type RefreshServices struct {
@@ -18,7 +21,7 @@ func NewRefreshServices(repo *repositories.RefreshRepository, userRepo *reposito
 	}
 }
 
-func (s *RefreshServices) Refresh(refresh_token string) (*responses.LoginResponse, error) {
+func (s *RefreshServices) Refresh(refresh_token string, user_id uuid.UUID) (*responses.LoginResponse, error) {
 	refreshToken, err := s.refreshRepo.FindByRefreshToken(utils.HashToken(refresh_token))
 	if err != nil {
 		return nil, err
@@ -43,7 +46,16 @@ func (s *RefreshServices) Refresh(refresh_token string) (*responses.LoginRespons
 	if err != nil {
 		return nil, err
 	}
-
+	// Save the new refresh token hashed
+	if err := s.refreshRepo.SaveRefreshToken(&models.RefreshToken{
+		ID:          uuid.New(),
+		HashedToken: utils.HashToken(refresh),
+		UserID:      user_id,
+		IsRevoked:   false,
+	}); err != nil {
+		return nil, err
+	}
+	// Return the new tokens and user information
 	return &responses.LoginResponse{
 		AccessToken:  access,
 		RefreshToken: refresh,
