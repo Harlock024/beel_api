@@ -34,6 +34,7 @@ func CreateRefreshToken(username string, userId uuid.UUID) (string, error) {
 			"user_id":  userId,
 			"username": username,
 			"exp":      time.Now().Add(time.Hour * 24 * 7).Unix(),
+			"jti":      uuid.New().String(),
 		})
 	tokenString, err := token.SignedString(GetRefreshSecretKey())
 	if err != nil {

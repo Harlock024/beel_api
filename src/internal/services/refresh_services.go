@@ -27,9 +27,6 @@ func (s *RefreshServices) Refresh(refresh_token string, user_id uuid.UUID) (*res
 		return nil, err
 	}
 
-	if refreshToken == nil {
-		return nil, err
-	}
 	// Delete the old refresh token
 	if err := s.refreshRepo.DeleteRefreshToken(refreshToken); err != nil {
 		return nil, err
@@ -41,7 +38,7 @@ func (s *RefreshServices) Refresh(refresh_token string, user_id uuid.UUID) (*res
 	}
 
 	// Generate new tokens (access and refresh)
-	access, refresh, err := utils.GenerateTokens(user.Username, user.ID)
+	newAccess, newRefresh, err := utils.GenerateTokens(user.Username, user.ID)
 
 	if err != nil {
 		return nil, err
@@ -49,16 +46,17 @@ func (s *RefreshServices) Refresh(refresh_token string, user_id uuid.UUID) (*res
 	// Save the new refresh token hashed
 	if err := s.refreshRepo.SaveRefreshToken(&models.RefreshToken{
 		ID:          uuid.New(),
-		HashedToken: utils.HashToken(refresh),
+		HashedToken: utils.HashToken(newRefresh),
 		UserID:      user_id,
 		IsRevoked:   false,
 	}); err != nil {
 		return nil, err
 	}
+
 	// Return the new tokens and user information
 	return &responses.LoginResponse{
-		AccessToken:  access,
-		RefreshToken: refresh,
+		AccessToken:  newAccess,
+		RefreshToken: newRefresh,
 		User: responses.UserResponse{
 			ID:        user.ID,
 			Username:  user.Username,
