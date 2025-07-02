@@ -5,6 +5,7 @@ import (
 	"beel_api/src/internal/models"
 	"beel_api/src/internal/repositories"
 	"beel_api/src/pkg/utils"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -36,7 +37,6 @@ func (s *RefreshServices) Refresh(refresh_token string, user_id uuid.UUID) (*res
 	if err != nil {
 		return nil, err
 	}
-
 	// Generate new tokens (access and refresh)
 	newAccess, newRefresh, err := utils.GenerateTokens(user.Username, user.ID)
 
@@ -49,6 +49,7 @@ func (s *RefreshServices) Refresh(refresh_token string, user_id uuid.UUID) (*res
 		HashedToken: utils.HashToken(newRefresh),
 		UserID:      user_id,
 		IsRevoked:   false,
+		ExpiresAt:   time.Now(),
 	}); err != nil {
 		return nil, err
 	}
