@@ -21,12 +21,11 @@ func main() {
 	r := gin.Default()
 
 	config := cors.Config{
-		AllowOrigins:     []string{"https://beel-web.vercel.app"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
+		AllowOrigins:  []string{"https://beel-web.vercel.app"},
+		AllowMethods:  []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"},
+		AllowHeaders:  []string{"Origin", "Content-Type"},
+		ExposeHeaders: []string{"Content-Length"},
+		MaxAge:        12 * time.Hour,
 	}
 	r.Use(cors.New(config))
 
