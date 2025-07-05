@@ -22,7 +22,7 @@ func (r *RefreshRepository) SaveRefreshToken(refresh *models.RefreshToken) error
 }
 func (r *RefreshRepository) FindByRefreshToken(refreshTokenHashed string) (*models.RefreshToken, error) {
 	refreshToken := &models.RefreshToken{}
-	if err := r.db.Where("HashedToken = ?", refreshTokenHashed).First(refreshToken).Error; err != nil {
+	if err := r.db.Where("hashed_token = ?", refreshTokenHashed).First(refreshToken).Error; err != nil {
 		return nil, err
 	}
 	return refreshToken, nil

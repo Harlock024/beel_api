@@ -89,7 +89,8 @@ func (s *AuthService) Login(dto dtos.LoginDTO) (*responses.LoginResponse, error)
 	if err := s.refreshRepo.SaveRefreshToken(&models.RefreshToken{
 		ID:          uuid.New(),
 		UserID:      user.ID,
-		HashedToken: refreshToken,
+		HashedToken: utils.HashToken(refreshToken),
+		IsRevoked:   false,
 	}); err != nil {
 		return nil, err
 	}

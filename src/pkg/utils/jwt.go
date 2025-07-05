@@ -33,7 +33,8 @@ func CreateRefreshToken(username string, userId uuid.UUID) (string, error) {
 		jwt.MapClaims{
 			"user_id":  userId,
 			"username": username,
-			"exp":      time.Now().Add(time.Hour * 24 * 30).Unix(),
+			"exp":      time.Now().Add(time.Hour * 24 * 7).Unix(),
+			"jti":      uuid.New().String(),
 		})
 	tokenString, err := token.SignedString(GetRefreshSecretKey())
 	if err != nil {
@@ -47,7 +48,7 @@ func CreateAccessToken(username string, userId uuid.UUID) (string, error) {
 		jwt.MapClaims{
 			"user_id":  userId,
 			"username": username,
-			"exp":      time.Now().Add(time.Hour * 24).Unix(),
+			"exp":      time.Now().Add(time.Minute * 15).Unix(),
 		})
 	tokenString, err := token.SignedString(GetAccessSecretKey())
 	if err != nil {
