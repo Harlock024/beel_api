@@ -8,6 +8,7 @@ import (
 
 func ListRoutes(router *gin.RouterGroup, listHandler *handlers.ListHandler) {
 	router.GET("/lists", listHandler.FindListsByUser)
+	router.GET("/list/:id", listHandler.FindListById)
 	router.POST("/lists", listHandler.CreateList)
 	router.PUT("/lists/:id", listHandler.UpdateList)
 	router.DELETE("/lists/:id", listHandler.DeleteList)

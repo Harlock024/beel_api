@@ -28,7 +28,6 @@ func main() {
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}
-
 	r.Use(cors.New(config))
 
 	auth := r.Group("/auth")

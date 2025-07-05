@@ -46,6 +46,38 @@ func (h *ListHandler) FindListsByUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"lists": listsRes})
 	return
 }
+func (h *ListHandler) FindListById(c *gin.Context) {
+	claimsRaw, exists := c.Get("claims")
+
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	claims := claimsRaw.(jwt.MapClaims)
+	user_id := claims["user_id"].(string)
+	if user_id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User ID not found in claims"})
+		return
+	}
+	list_id := c.Param("id")
+
+	if list_id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "List ID is required"})
+		return
+	}
+	list, err := h.service.GetListById(uuid.MustParse(list_id), uuid.MustParse(user_id))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	if list == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "List not found"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"list": list})
+	return
+}
 
 func (h *ListHandler) CreateList(c *gin.Context) {
 	claimsRaw, exists := c.Get("claims")
@@ -104,7 +136,7 @@ func (h *ListHandler) UpdateList(c *gin.Context) {
 		return
 	}
 
-	updatedList, err := h.service.UpdateList(uuid.MustParse(list_id), *list)
+	updatedList, err := h.service.UpdateList(uuid.MustParse(list_id), *list, uuid.MustParse(user_id))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -133,7 +165,6 @@ func (h *ListHandler) DeleteList(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "List ID is required"})
 		return
 	}
-
 	if err := h.service.DeleteList(uuid.MustParse(list_id)); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

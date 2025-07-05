@@ -52,7 +52,7 @@ func (r *TaskRepository) GetTasksByFilter(start string, end string, user_id uuid
 	var tasks []*models.Task
 	if err := r.db.
 		Preload("Tags").
-		Where(" user_id = ?  due_date >= ? AND due_date < ?", user_id, start, end).
+		Where("user_id = ? AND due_date >= ? AND due_date < ?", user_id, start, end).
 		Find(&tasks).Error; err != nil {
 		return nil, err
 	}

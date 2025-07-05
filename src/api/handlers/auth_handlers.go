@@ -35,11 +35,10 @@ func (h *AuthHandler) RegisterHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	secure := gin.Mode() == gin.ReleaseMode
-	c.SetCookie("access_token", response.AccessToken, 3600, "/", ".vercel.app", secure, true)
-	c.SetCookie("refresh_token", response.RefreshToken, 3600*24*30, "/", ".vercel.app", secure, true)
 
 	c.JSON(http.StatusOK, gin.H{
+		"access_token":  response.AccessToken,
+		"refresh_token": response.RefreshToken,
 		"user": responses.UserResponse{
 			ID:        response.User.ID,
 			Username:  response.User.Username,
@@ -61,7 +60,7 @@ func (h *AuthHandler) LoginHandler(c *gin.Context) {
 		return
 	}
 
-	resposense, err := h.service.Login(login)
+	response, err := h.service.Login(login)
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -74,42 +73,14 @@ func (h *AuthHandler) LoginHandler(c *gin.Context) {
 		}
 		return
 	}
-
-	if resposense == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate tokens"})
-		return
-	}
-
-	secure := gin.Mode() == gin.ReleaseMode
-
-	accessCookie := &http.Cookie{
-		Name:  "access_token",
-		Value: resposense.AccessToken,
-		Path:  "/",
-
-		MaxAge:   3600,
-		Secure:   secure,
-		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
-	}
-	http.SetCookie(c.Writer, accessCookie)
-	refreshCookie := &http.Cookie{
-		Name:     "refresh_token",
-		Value:    resposense.RefreshToken,
-		Path:     "/",
-		MaxAge:   3600 * 24 * 30,
-		Secure:   secure,
-		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
-	}
-	http.SetCookie(c.Writer, refreshCookie)
-
 	c.JSON(http.StatusOK, gin.H{
+		"access_token":  response.AccessToken,
+		"refresh_token": response.RefreshToken,
 		"user": responses.UserResponse{
-			ID:        resposense.User.ID,
-			Username:  resposense.User.Username,
-			Email:     resposense.User.Email,
-			AvatarURL: resposense.User.AvatarURL,
+			ID:        response.User.ID,
+			Username:  response.User.Username,
+			Email:     response.User.Email,
+			AvatarURL: response.User.AvatarURL,
 		},
 	})
 	return
