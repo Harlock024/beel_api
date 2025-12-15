@@ -6,7 +6,6 @@ import (
 	"beel_api/src/internal/models"
 	"beel_api/src/internal/repositories"
 	"beel_api/src/pkg/utils"
-
 	"github.com/google/uuid"
 )
 

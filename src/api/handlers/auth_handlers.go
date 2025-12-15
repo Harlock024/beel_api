@@ -46,7 +46,6 @@ func (h *AuthHandler) RegisterHandler(c *gin.Context) {
 			AvatarURL: response.User.AvatarURL,
 		},
 	})
-	return
 }
 func (h *AuthHandler) LoginHandler(c *gin.Context) {
 	var login dtos.LoginDTO
@@ -112,26 +111,3 @@ func GetMe(c *gin.Context) {
 		"user": UserFoundResponse,
 	})
 }
-
-// func LogOut(c *gin.Context) {
-// 	claimsRaw, exists := c.Get("claims")
-// 	if !exists {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Unauthorized"})
-// 		return
-// 	}
-// 	claims := claimsRaw.(jwt.MapClaims)
-// 	user_id := claims["user_id"].(string)
-
-// 	var refreshTokens models.RefreshToken
-// 	err := db.DB.Delete("user_id=?", user_id).Find(&refreshTokens).Error
-
-// 	if err != nil {
-// 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found",
-// 			"logged_out": false})
-// 		return
-// 	}
-
-// 	c.JSON(http.StatusOK, gin.H{
-// 		"logged_out": true,
-// 	})
-// }
