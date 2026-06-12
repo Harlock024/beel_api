@@ -12,12 +12,12 @@ type TaskResponse struct {
 	Description string          `json:"description"`
 	UserID      uuid.UUID       `json:"user_id"`
 	Status      string          `json:"status"`
-	ListID      uuid.UUID       `json:"list_id"`
+	ListID      *uuid.UUID      `json:"list_id"`
 	IsCompleted bool            `json:"is_completed"`
 	Tags        []TagResponse   `json:"tags"`
 	DueDate     string          `json:"due_date"`
 	ParentID    *uuid.UUID      `json:"parent_id"`
-	Subtasks    []TaskResponse `json:"subtasks"`
+	Subtasks    []TaskResponse  `json:"subtasks"`
 	ColumnID    *uuid.UUID      `json:"column_id"`
 	Position    int             `json:"position"`
 }
@@ -37,11 +37,7 @@ func NewTaskResponse(task *models.Task) *TaskResponse {
 	taskResponse.ColumnID = task.ColumnID
 	taskResponse.Position = task.Position
 
-	if task.ListID != uuid.Nil {
-		taskResponse.ListID = task.ListID
-	} else {
-		taskResponse.ListID = uuid.Nil
-	}
+	taskResponse.ListID = task.ListID
 
 	if len(task.Tags) > 0 {
 		tagResponses := make([]TagResponse, len(task.Tags))

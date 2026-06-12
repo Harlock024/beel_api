@@ -54,7 +54,7 @@ func (s *ColumnService) CreateColumn(boardId uuid.UUID, dto *dtos.ColumnDTO) (*r
 	return &resp, nil
 }
 
-func (s *ColumnService) UpdateColumn(columnId uuid.UUID, dto *dtos.ColumnDTO) (*responses.ColumnResponse, error) {
+func (s *ColumnService) UpdateColumn(columnId uuid.UUID, dto *dtos.UpdateColumnDTO) (*responses.ColumnResponse, error) {
 	existing, err := s.repo.GetColumnById(columnId)
 	if err != nil {
 		return nil, err

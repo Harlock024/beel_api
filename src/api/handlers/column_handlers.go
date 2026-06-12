@@ -62,7 +62,7 @@ func (h *ColumnHandler) UpdateColumn(c *gin.Context) {
 		return
 	}
 
-	var dto dtos.ColumnDTO
+	var dto dtos.UpdateColumnDTO
 	if err := c.ShouldBindJSON(&dto); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

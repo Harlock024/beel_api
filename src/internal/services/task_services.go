@@ -36,7 +36,7 @@ func (s *TaskService) GetTasksByListId(listId uuid.UUID) ([]*responses.TaskRespo
 	return taskResponses, nil
 }
 
-func (s *TaskService) CreateTask(task *dtos.NewTaskDTO, list_id uuid.UUID, user_id uuid.UUID) (*responses.TaskResponse, error) {
+func (s *TaskService) CreateTask(task *dtos.NewTaskDTO, list_id *uuid.UUID, user_id uuid.UUID) (*responses.TaskResponse, error) {
 
 	newTask := &models.Task{
 		ID:       uuid.New(),
@@ -71,7 +71,7 @@ func (s *TaskService) UpdateTask(task_id uuid.UUID, task *dtos.UpdateTaskDTO) (*
 		existingTask.DueDate = task.DueDate
 	}
 	if task.ListID != nil {
-		existingTask.ListID = *task.ListID
+		existingTask.ListID = task.ListID
 	}
 	if task.IsCompleted {
 		existingTask.IsCompleted = task.IsCompleted
@@ -86,7 +86,7 @@ func (s *TaskService) UpdateTask(task_id uuid.UUID, task *dtos.UpdateTaskDTO) (*
 		if err != nil {
 			return nil, fmt.Errorf("parent task not found")
 		}
-		if parent.ListID != existingTask.ListID {
+		if parent.ListID == nil || existingTask.ListID == nil || *parent.ListID != *existingTask.ListID {
 			return nil, fmt.Errorf("parent task must be in the same list")
 		}
 

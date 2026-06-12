@@ -4,7 +4,6 @@ import (
 	"beel_api/src/api/responses"
 	"beel_api/src/dtos"
 	"beel_api/src/internal/services"
-	"encoding/json"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -22,8 +21,6 @@ func NewTaskHandler(service *services.TaskService) *TaskHandler {
 
 func (h *TaskHandler) CreateTask(c *gin.Context) {
 	var task dtos.NewTaskDTO
-
-	var list_id = c.Param("id")
 
 	if err := c.ShouldBindJSON(&task); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -44,7 +41,13 @@ func (h *TaskHandler) CreateTask(c *gin.Context) {
 		return
 	}
 
-	taskRes, err := h.service.CreateTask(&task, uuid.MustParse(list_id), uuid.MustParse(user_id))
+	var listID *uuid.UUID
+	if list_id := c.Param("id"); list_id != "" {
+		parsed := uuid.MustParse(list_id)
+		listID = &parsed
+	}
+
+	taskRes, err := h.service.CreateTask(&task, listID, uuid.MustParse(user_id))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
