@@ -263,7 +263,7 @@ func (s *TaskService) AddTagToTask(taskId uuid.UUID, tagId uuid.UUID) (*response
 	if err := s.repo.AddTagToTask(taskId, tagId); err != nil {
 		return nil, err
 	}
-	task, err := s.repo.GetTaskById(taskId)
+	task, err := s.repo.GetTaskByIdWithTags(taskId)
 	if err != nil {
 		return nil, err
 	}
@@ -274,7 +274,7 @@ func (s *TaskService) RemoveTagFromTask(taskId uuid.UUID, tagId uuid.UUID) (*res
 	if err := s.repo.RemoveTagFromTask(taskId, tagId); err != nil {
 		return nil, err
 	}
-	task, err := s.repo.GetTaskById(taskId)
+	task, err := s.repo.GetTaskByIdWithTags(taskId)
 	if err != nil {
 		return nil, err
 	}

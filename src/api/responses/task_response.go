@@ -14,7 +14,7 @@ type TaskResponse struct {
 	Status      string          `json:"status"`
 	ListID      uuid.UUID       `json:"list_id"`
 	IsCompleted bool            `json:"is_completed"`
-	Tags        []string        `json:"tags"`
+	Tags        []TagResponse   `json:"tags"`
 	DueDate     string          `json:"due_date"`
 	ParentID    *uuid.UUID      `json:"parent_id"`
 	Subtasks    []*TaskResponse `json:"subtasks"`
@@ -40,11 +40,11 @@ func NewTaskResponse(task *models.Task) *TaskResponse {
 	}
 
 	if len(task.Tags) > 0 {
-		tagNames := make([]string, len(task.Tags))
-		for i, tag := range task.Tags {
-			tagNames[i] = tag.Name
+		tags := make([]TagResponse, len(task.Tags))
+		for i := range task.Tags {
+			tags[i] = NewTagResponse(&task.Tags[i])
 		}
-		taskResponse.Tags = tagNames
+		taskResponse.Tags = tags
 	}
 
 	if len(task.Subtasks) > 0 {

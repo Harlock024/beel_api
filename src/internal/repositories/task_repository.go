@@ -107,25 +107,21 @@ func (r *TaskRepository) GetTasksByTag(tagId uuid.UUID) ([]*models.Task, error) 
 }
 
 func (r *TaskRepository) AddTagToTask(taskId uuid.UUID, tagId uuid.UUID) error {
-	var task models.Task
-	if err := r.db.Where("id = ?", taskId).First(&task).Error; err != nil {
-		return err
-	}
-	var tag models.Tag
-	if err := r.db.Where("id = ?", tagId).First(&tag).Error; err != nil {
-		return err
-	}
-	return r.db.Model(&task).Association("Tags").Append(&tag)
+	task := &models.Task{ID: taskId}
+	tag := &models.Tag{ID: tagId}
+	return r.db.Model(task).Association("Tags").Append(tag)
 }
 
 func (r *TaskRepository) RemoveTagFromTask(taskId uuid.UUID, tagId uuid.UUID) error {
+	task := &models.Task{ID: taskId}
+	tag := &models.Tag{ID: tagId}
+	return r.db.Model(task).Association("Tags").Delete(tag)
+}
+
+func (r *TaskRepository) GetTaskByIdWithTags(id uuid.UUID) (*models.Task, error) {
 	var task models.Task
-	if err := r.db.Where("id = ?", taskId).First(&task).Error; err != nil {
-		return err
+	if err := r.db.Preload("Tags").Where("id = ?", id).First(&task).Error; err != nil {
+		return nil, err
 	}
-	var tag models.Tag
-	if err := r.db.Where("id = ?", tagId).First(&tag).Error; err != nil {
-		return err
-	}
-	return r.db.Model(&task).Association("Tags").Delete(&tag)
+	return &task, nil
 }
