@@ -201,7 +201,7 @@ func (h *TaskHandler) GetTasksByFilter(c *gin.Context) {
 		return
 	}
 	if len(tasks) == 0 {
-		c.JSON(http.StatusOK, gin.H{"tasks": []responses.TaskResponses{}})
+		c.JSON(http.StatusOK, gin.H{"tasks": []*responses.TaskResponse{}})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"tasks": tasks})

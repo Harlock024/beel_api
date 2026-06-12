@@ -2,6 +2,6 @@ package dtos
 
 
 type UpdateUser struct {
-	Username string `json:"username"`
-	AvatarUrl string `json:"avatar_url"`
+	Username  string `json:"username" binding:"required"`
+	AvatarUrl string `json:"avatar_url" binding:"required"`
 }

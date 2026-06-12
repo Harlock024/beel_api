@@ -49,7 +49,7 @@ func (s *RefreshServices) Refresh(refresh_token string, user_id uuid.UUID) (*res
 		HashedToken: utils.HashToken(newRefresh),
 		UserID:      user_id,
 		IsRevoked:   false,
-		ExpiresAt:   time.Now(),
+		ExpiresAt:   time.Now().Add(time.Hour * 24 * 7),
 	}); err != nil {
 		return nil, err
 	}

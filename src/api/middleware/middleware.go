@@ -41,23 +41,22 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		if claims, ok := token.Claims.(jwt.MapClaims); !ok {
-			if exp, ok := claims["exp"].(float64); ok {
-				if int64(exp) < time.Now().Unix() {
-					c.JSON(http.StatusUnauthorized, gin.H{"error": "Token expired"})
-					c.Abort()
-					return
-				}
-			}
-		}
-		if claims, ok := token.Claims.(jwt.MapClaims); ok {
-			c.Set("claims", claims)
-			c.Next()
-
-		} else {
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
 			c.Abort()
 			return
 		}
+
+		if exp, ok := claims["exp"].(float64); ok {
+			if int64(exp) < time.Now().Unix() {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "Token expired"})
+				c.Abort()
+				return
+			}
+		}
+
+		c.Set("claims", claims)
+		c.Next()
 	}
 }

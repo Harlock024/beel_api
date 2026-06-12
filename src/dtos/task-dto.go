@@ -5,7 +5,7 @@ import (
 )
 
 type NewTaskDTO struct {
-	Title string `json:"title"`
+	Title string `json:"title" binding:"required"`
 }
 type UpdateTaskDTO struct {
 	Title       string      `json:"title"`

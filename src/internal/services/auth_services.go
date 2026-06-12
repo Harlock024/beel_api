@@ -6,6 +6,8 @@ import (
 	"beel_api/src/internal/models"
 	"beel_api/src/internal/repositories"
 	"beel_api/src/pkg/utils"
+	"time"
+
 	"github.com/google/uuid"
 )
 
@@ -45,6 +47,7 @@ func (s *AuthService) Register(dto dtos.RegisterDTO) (*responses.LoginResponse, 
 		ID:          uuid.New(),
 		UserID:      user.ID,
 		HashedToken: refreshToken,
+		ExpiresAt:   time.Now().Add(time.Hour * 24 * 7),
 	}); err != nil {
 		return nil, err
 	}
@@ -90,6 +93,7 @@ func (s *AuthService) Login(dto dtos.LoginDTO) (*responses.LoginResponse, error)
 		UserID:      user.ID,
 		HashedToken: utils.HashToken(refreshToken),
 		IsRevoked:   false,
+		ExpiresAt:   time.Now().Add(time.Hour * 24 * 7),
 	}); err != nil {
 		return nil, err
 	}

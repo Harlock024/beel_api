@@ -90,7 +90,7 @@ func (h *ListHandler) CreateList(c *gin.Context) {
 	user_id := claims["user_id"].(string)
 
 	var list *dtos.ListDTO
-	if err := c.BindJSON(&list); err != nil {
+	if err := c.ShouldBindJSON(&list); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -131,7 +131,7 @@ func (h *ListHandler) UpdateList(c *gin.Context) {
 	}
 	var list *dtos.ListDTO
 
-	if err := c.BindJSON(&list); err != nil {
+	if err := c.ShouldBindJSON(&list); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}

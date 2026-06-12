@@ -26,6 +26,5 @@ func HashToken(token string) string {
 }
 
 func CompareToken(hashedToken, token string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hashedToken), []byte(token))
-	return err == nil
+	return hashedToken == HashToken(token)
 }
