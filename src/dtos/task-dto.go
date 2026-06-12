@@ -17,4 +17,6 @@ type UpdateTaskDTO struct {
 	ListID      *uuid.UUID  `json:"list_id"`
 	TagIDs      []uuid.UUID `json:"tag_ids"`
 	ParentID    *uuid.UUID  `json:"parent_id"`
+	ColumnID    *uuid.UUID  `json:"column_id"`
+	Position    *int        `json:"position"`
 }

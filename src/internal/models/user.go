@@ -11,4 +11,5 @@ type User struct {
 	Lists     []List    `gorm:"foreignKey:UserID"`
 	Tasks     []Task    `gorm:"foreignKey:UserID"`
 	Tags      []Tag     `gorm:"foreignKey:UserID"`
+	Boards    []Board   `gorm:"foreignKey:UserID"`
 }

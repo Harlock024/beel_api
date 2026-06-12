@@ -125,3 +125,7 @@ func (r *TaskRepository) GetTaskByIdWithTags(id uuid.UUID) (*models.Task, error)
 	}
 	return &task, nil
 }
+
+func (r *TaskRepository) BatchUpdateTasks(tasks []models.Task) error {
+	return r.db.Save(&tasks).Error
+}

@@ -103,6 +103,13 @@ func (s *TaskService) UpdateTask(task_id uuid.UUID, task *dtos.UpdateTaskDTO) (*
 		existingTask.ParentID = nil
 	}
 
+	if task.ColumnID != nil {
+		existingTask.ColumnID = task.ColumnID
+	}
+	if task.Position != nil {
+		existingTask.Position = *task.Position
+	}
+
 	err = s.repo.UpdateTask(existingTask)
 	if err != nil {
 		return nil, err
@@ -279,4 +286,19 @@ func (s *TaskService) RemoveTagFromTask(taskId uuid.UUID, tagId uuid.UUID) (*res
 		return nil, err
 	}
 	return responses.NewTaskResponse(task), nil
+}
+
+func (s *TaskService) BatchUpdateTasks(dto *dtos.BatchUpdateDTO) error {
+	var tasks []models.Task
+	for _, item := range dto.Tasks {
+		task := models.Task{
+			ID:       item.ID,
+			ColumnID: item.ColumnID,
+		}
+		if item.Position != nil {
+			task.Position = *item.Position
+		}
+		tasks = append(tasks, task)
+	}
+	return s.repo.BatchUpdateTasks(tasks)
 }

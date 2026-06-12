@@ -8,7 +8,7 @@ import (
 )
 
 func Run() {
-	err := db.DB.AutoMigrate(&models.User{}, &models.Task{}, &models.List{}, &models.Tag{}, &models.RefreshToken{}) 
+	err := db.DB.AutoMigrate(&models.User{}, &models.Board{}, &models.Column{}, &models.Task{}, &models.List{}, &models.Tag{}, &models.RefreshToken{}) 
 
 	if err != nil {
 		log.Fatal("Error AutoMigrate",err)

@@ -17,7 +17,9 @@ type TaskResponse struct {
 	Tags        []TagResponse   `json:"tags"`
 	DueDate     string          `json:"due_date"`
 	ParentID    *uuid.UUID      `json:"parent_id"`
-	Subtasks    []*TaskResponse `json:"subtasks"`
+	Subtasks    []TaskResponse `json:"subtasks"`
+	ColumnID    *uuid.UUID      `json:"column_id"`
+	Position    int             `json:"position"`
 }
 type TaskResponses []TaskResponse
 
@@ -32,6 +34,8 @@ func NewTaskResponse(task *models.Task) *TaskResponse {
 	taskResponse.DueDate = task.DueDate
 	taskResponse.IsCompleted = task.IsCompleted
 	taskResponse.ParentID = task.ParentID
+	taskResponse.ColumnID = task.ColumnID
+	taskResponse.Position = task.Position
 
 	if task.ListID != uuid.Nil {
 		taskResponse.ListID = task.ListID
@@ -40,17 +44,17 @@ func NewTaskResponse(task *models.Task) *TaskResponse {
 	}
 
 	if len(task.Tags) > 0 {
-		tags := make([]TagResponse, len(task.Tags))
-		for i := range task.Tags {
-			tags[i] = NewTagResponse(&task.Tags[i])
+		tagResponses := make([]TagResponse, len(task.Tags))
+		for i, tag := range task.Tags {
+			tagResponses[i] = NewTagResponse(&tag)
 		}
-		taskResponse.Tags = tags
+		taskResponse.Tags = tagResponses
 	}
 
 	if len(task.Subtasks) > 0 {
-		subtasks := make([]*TaskResponse, len(task.Subtasks))
+		subtasks := make([]TaskResponse, len(task.Subtasks))
 		for i := range task.Subtasks {
-			subtasks[i] = NewTaskResponse(&task.Subtasks[i])
+			subtasks[i] = *NewTaskResponse(&task.Subtasks[i])
 		}
 		taskResponse.Subtasks = subtasks
 	}

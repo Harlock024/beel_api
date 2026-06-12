@@ -4,7 +4,7 @@ import (
 	"beel_api/src/api/responses"
 	"beel_api/src/dtos"
 	"beel_api/src/internal/services"
-
+	"encoding/json"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -384,3 +384,28 @@ func (h *TaskHandler) RemoveTagFromTask(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"task": task})
 }
+
+// func (h *TaskHandler) BatchUpdateTasks(c *gin.Context) {
+// 	var raw json.RawMessage
+// 	if err := c.ShouldBindJSON(&raw); err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+// 		return
+// 	}
+
+// 	var dto dtos.BatchUpdateDTO
+// 	if err := json.Unmarshal(raw, &dto); err != nil || len(dto.Tasks) == 0 {
+// 		var tasksArr []dtos.BatchUpdateTaskDTO
+// 		if err := json.Unmarshal(raw, &tasksArr); err != nil || len(tasksArr) == 0 {
+// 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+// 			return
+// 		}
+// 		dto.Tasks = tasksArr
+// 	}
+
+// 	if err := h.service.BatchUpdateTasks(&dto); err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+// 		return
+// 	}
+
+// 	c.JSON(http.StatusOK, gin.H{"message": "Tasks updated successfully"})
+// }
