@@ -7,6 +7,8 @@ import (
 	"beel_api/src/db"
 	"beel_api/src/internal/repositories"
 	"beel_api/src/internal/services"
+	"beel_api/src/migrations"
+	
 	"os"
 
 	"time"
@@ -17,7 +19,9 @@ import (
 
 func main() {
 	db.InitDB()
-	//migrations.Run()
+	migrations.Run()
+
+
 	r := gin.Default()
 
 	config := cors.Config{
