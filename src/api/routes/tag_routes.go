@@ -9,7 +9,7 @@ import (
 func TagRoutes(router *gin.RouterGroup, tagHandler *handlers.TagHandler) {
 	router.POST("/tags", tagHandler.CreateTag)
 	router.GET("/tags", tagHandler.GetTags)
-	// router.GET("/tags/:id", tagHandler.GetTag)
+	router.GET("/tags/:id", tagHandler.GetTagTasks)
 	router.PUT("/tags/:id", tagHandler.UpdateTag)
 	router.DELETE("/tags/:id", tagHandler.DeleteTag)
 }

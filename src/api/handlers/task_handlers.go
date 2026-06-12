@@ -207,3 +207,180 @@ func (h *TaskHandler) GetTasksByFilter(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"tasks": tasks})
 	return
 }
+
+func (h *TaskHandler) GetSubtasks(c *gin.Context) {
+	parentID := c.Param("id")
+	if parentID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Task ID is required"})
+		return
+	}
+
+	claimsRaw, exists := c.Get("claims")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Unauthorized"})
+		return
+	}
+	claims := claimsRaw.(jwt.MapClaims)
+	user_id := claims["user_id"].(string)
+	if user_id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User ID is required"})
+		return
+	}
+
+	subtasks, err := h.service.GetSubtasksByParentId(uuid.MustParse(parentID))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"subtasks": subtasks})
+}
+
+func (h *TaskHandler) AddSubtask(c *gin.Context) {
+	parentID := c.Param("id")
+	if parentID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Task ID is required"})
+		return
+	}
+
+	var dto dtos.NewTaskDTO
+	if err := c.ShouldBindJSON(&dto); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	claimsRaw, exists := c.Get("claims")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Unauthorized"})
+		return
+	}
+	claims := claimsRaw.(jwt.MapClaims)
+	user_id := claims["user_id"].(string)
+	if user_id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User ID is required"})
+		return
+	}
+
+	subtask, err := h.service.AddSubtask(uuid.MustParse(parentID), &dto, uuid.MustParse(user_id))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"subtask": subtask})
+}
+
+func (h *TaskHandler) RemoveSubtask(c *gin.Context) {
+	parentID := c.Param("id")
+	subtaskID := c.Param("sub_id")
+	if parentID == "" || subtaskID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Task ID and Subtask ID are required"})
+		return
+	}
+
+	claimsRaw, exists := c.Get("claims")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Unauthorized"})
+		return
+	}
+	claims := claimsRaw.(jwt.MapClaims)
+	user_id := claims["user_id"].(string)
+	if user_id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User ID is required"})
+		return
+	}
+
+	err := h.service.RemoveSubtask(uuid.MustParse(parentID), uuid.MustParse(subtaskID))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusNoContent, nil)
+}
+
+func (h *TaskHandler) GetTasksByTag(c *gin.Context) {
+	tagID := c.Query("tag")
+	if tagID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Tag query parameter is required"})
+		return
+	}
+
+	claimsRaw, exists := c.Get("claims")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Unauthorized"})
+		return
+	}
+	claims := claimsRaw.(jwt.MapClaims)
+	user_id := claims["user_id"].(string)
+	if user_id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User ID is required"})
+		return
+	}
+
+	tasks, err := h.service.GetTasksByTag(uuid.MustParse(tagID))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"tasks": tasks})
+}
+
+func (h *TaskHandler) AddTagToTask(c *gin.Context) {
+	taskID := c.Param("id")
+	tagID := c.Param("tag_id")
+	if taskID == "" || tagID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Task ID and Tag ID are required"})
+		return
+	}
+
+	claimsRaw, exists := c.Get("claims")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Unauthorized"})
+		return
+	}
+	claims := claimsRaw.(jwt.MapClaims)
+	user_id := claims["user_id"].(string)
+	if user_id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User ID is required"})
+		return
+	}
+
+	task, err := h.service.AddTagToTask(uuid.MustParse(taskID), uuid.MustParse(tagID))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"task": task})
+}
+
+func (h *TaskHandler) RemoveTagFromTask(c *gin.Context) {
+	taskID := c.Param("id")
+	tagID := c.Param("tag_id")
+	if taskID == "" || tagID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Task ID and Tag ID are required"})
+		return
+	}
+
+	claimsRaw, exists := c.Get("claims")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Unauthorized"})
+		return
+	}
+	claims := claimsRaw.(jwt.MapClaims)
+	user_id := claims["user_id"].(string)
+	if user_id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User ID is required"})
+		return
+	}
+
+	task, err := h.service.RemoveTagFromTask(uuid.MustParse(taskID), uuid.MustParse(tagID))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"task": task})
+}

@@ -126,3 +126,31 @@ func (h *TagHandler) DeleteTag(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Tag deleted successfully"})
 	return
 }
+
+func (h *TagHandler) GetTagTasks(c *gin.Context) {
+	tagId := c.Param("id")
+	if tagId == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Tag ID is required"})
+		return
+	}
+
+	claimsRaw, exists := c.Get("claims")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Unauthorized"})
+		return
+	}
+	claims := claimsRaw.(jwt.MapClaims)
+	userID := claims["user_id"].(string)
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User ID not found in claims"})
+		return
+	}
+
+	tasks, err := h.service.GetTagTasks(uuid.MustParse(tagId))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"tasks": tasks})
+}

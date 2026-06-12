@@ -10,5 +10,5 @@ type User struct {
 	AvatarURL string    `json:"avatar_url"`
 	Lists     []List    `gorm:"foreignKey:UserID"`
 	Tasks     []Task    `gorm:"foreignKey:UserID"`
-	Tags      []Tag     `gorm:"foreignkey:CreatedBy"`
+	Tags      []Tag     `gorm:"foreignKey:UserID"`
 }

@@ -24,7 +24,8 @@ func (s *TagService) GetAllTagsByUserId(userId uuid.UUID) ([]*responses.TagRespo
 	}
 	var tagResponses []*responses.TagResponse
 	for _, tag := range tags {
-		tagResponse := responses.NewTagResponse(tag)
+		count, _ := s.repo.CountTasksByTag(tag.ID)
+		tagResponse := responses.NewTagResponseWithCount(tag, int(count))
 		tagResponses = append(tagResponses, &tagResponse)
 	}
 	return tagResponses, nil
@@ -75,4 +76,19 @@ func (s *TagService) DeleteTag(tagId uuid.UUID) error {
 		return err
 	}
 	return nil
+}
+
+func (s *TagService) GetTagTasks(tagId uuid.UUID) ([]*responses.TaskResponse, error) {
+	tasks, err := s.repo.GetTasksByTagId(tagId)
+	if err != nil {
+		return nil, err
+	}
+	var taskResponses []*responses.TaskResponse
+	for _, task := range tasks {
+		taskResponses = append(taskResponses, responses.NewTaskResponse(task))
+	}
+	if len(taskResponses) == 0 {
+		return []*responses.TaskResponse{}, nil
+	}
+	return taskResponses, nil
 }
