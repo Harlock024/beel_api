@@ -198,7 +198,7 @@ func (h *TaskHandler) GetTasksByFilter(c *gin.Context) {
 		return
 	}
 
-	tasks, err := h.service.GetTasksByFilter(filter, uuid.MustParse(user_id))
+	tasks, err := h.service.GetTasks(filter, uuid.MustParse(user_id))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

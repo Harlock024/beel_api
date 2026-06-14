@@ -6,6 +6,7 @@ import (
 
 type NewTaskDTO struct {
 	Title    string      `json:"title" binding:"required"`
+	DueDate string   `json:"due_date"`
 	ParentID *uuid.UUID  `json:"parent_id"`
 }
 type UpdateTaskDTO struct {

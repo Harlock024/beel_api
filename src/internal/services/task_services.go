@@ -19,6 +19,27 @@ func NewTaskService(taskRepository *repositories.TaskRepository) *TaskService {
 	return &TaskService{repo: taskRepository}
 }
 
+func formatDueDate(dueDate string) string {
+	if dueDate == "" {
+		return ""
+	}
+	formats := []string{
+		"2006-01-02",
+		"2006/01/02",
+		"02/01/2006",
+		"01/02/2006",
+		"2006-01-02T15:04:05Z",
+		"2006-01-02T15:04:05",
+		time.RFC3339,
+	}
+	for _, layout := range formats {
+		if t, err := time.Parse(layout, dueDate); err == nil {
+			return t.Format("2006-01-02")
+		}
+	}
+	return dueDate
+}
+
 func (s *TaskService) GetTasksByListId(listId uuid.UUID) ([]*responses.TaskResponse, error) {
 	tasks, err := s.repo.GetTasksByListId(listId)
 	if err != nil {
@@ -43,8 +64,10 @@ func (s *TaskService) CreateTask(task *dtos.NewTaskDTO, list_id *uuid.UUID, user
 		Title:    task.Title,
 		ListID:   list_id,
 		UserID:   user_id,
+		DueDate:  formatDueDate(task.DueDate),
 		ParentID: task.ParentID,
 	}
+	println(newTask)
 	err := s.repo.CreateTask(newTask)
 	if err != nil {
 		return nil, err
@@ -68,7 +91,7 @@ func (s *TaskService) UpdateTask(task_id uuid.UUID, task *dtos.UpdateTaskDTO) (*
 		existingTask.Status = task.Status
 	}
 	if task.DueDate != "" {
-		existingTask.DueDate = task.DueDate
+		existingTask.DueDate = formatDueDate(task.DueDate)
 	}
 	if task.ListID != nil {
 		existingTask.ListID = task.ListID
@@ -143,18 +166,15 @@ func (s *TaskService) GetTaskById(task_id uuid.UUID) (*responses.TaskResponse, e
 	return responses.NewTaskResponse(existingTask), nil
 }
 
-func (s TaskService) GetTasksByFilter(filter string, user_id uuid.UUID) ([]*responses.TaskResponse, error) {
-	if filter == "" {
-		return nil, nil
-	}
-
+func (s TaskService) GetTasks(filter string, user_id uuid.UUID) ([]*responses.TaskResponse, error) {
+	if filter != "" {
 	loc, _ := time.LoadLocation("America/Mexico_City")
-
-	if filter == "today" {
-		now := time.Now().In(loc)
-		start := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, loc).UTC()
-		end := start.Add(24 * time.Hour).UTC()
-		tasks, err := s.repo.GetTasksByFilter(start.String(), end.String(), user_id)
+	
+	switch filter {
+	case  "today" :
+		start :=time.Now()
+		end :=start.AddDate(0,0,1)
+		tasks, err := s.repo.GetTasksByFilter(start.Format(time.DateOnly),end.Format(time.DateOnly) , user_id)
 		if err != nil {
 			return nil, err
 		}
@@ -169,7 +189,8 @@ func (s TaskService) GetTasksByFilter(filter string, user_id uuid.UUID) ([]*resp
 		}
 
 		return taskResponses, nil
-	} else if filter == "upcoming" {
+	
+	case "upcoming" :
 		start := time.Now().In(loc).Truncate(24 * time.Hour).Add(24 * time.Hour).UTC()
 		end := start.Add(7 * 24 * time.Hour).UTC()
 		tasks, err := s.repo.GetTasksByFilter(start.String(), end.String(), user_id)
@@ -185,25 +206,25 @@ func (s TaskService) GetTasksByFilter(filter string, user_id uuid.UUID) ([]*resp
 			taskResponse := responses.NewTaskResponse(task)
 			taskResponses = append(taskResponses, taskResponse)
 		}
-		return taskResponses, nil
+		return taskResponses,nil
 	}
-	// } else if filter == "overdue" {
-	// 	tasks, err := s.repo.GetTasksByFilter("overdue")
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// 	if len(tasks) == 0 {
-	// 		return nil, nil
-	// 	}
-	// 	var taskResponses []*responses.TaskResponse
-	// 	for _, task := range tasks {
-	// 		taskResponse := responses.NewTaskResponse(task)
-	// 		taskResponses = append(taskResponses, taskResponse)
-	// 	}
-	// 	return taskResponses, nil
-	// }
-	return nil, nil
+		tasks,err := s.repo.GetTasks(user_id)
+		if err != nil {
+			return nil,err
+		}
+		if len (tasks) == 0 {
+			return nil,nil
+		}
+		var taskResponses []*responses.TaskResponse
+		for  _ ,task := range tasks {
+			taskResponse := responses.NewTaskResponse(task)
+			taskResponses = append(taskResponses,taskResponse)
+		}
 
+	}
+		
+
+	return nil,nil
 }
 
 func (s *TaskService) GetSubtasksByParentId(parentId uuid.UUID) ([]*responses.TaskResponse, error) {

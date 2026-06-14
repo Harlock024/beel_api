@@ -48,6 +48,14 @@ func (r *TaskRepository) GetTaskById(id uuid.UUID) (*models.Task, error) {
 	return &task, nil
 }
 
+func (r *TaskRepository) GetTasks(user_id uuid.UUID) ([]*models.Task,error){
+	var tasks []*models.Task
+	if err := r.db.Preload("Tags").Preload("Subtasks.Tags").Where("user_id = ?",user_id).Find(&tasks).Error; err != nil {
+		return  nil,err
+	}
+	return tasks ,nil
+} 
+
 func (r *TaskRepository) GetTasksByFilter(start string, end string, user_id uuid.UUID) ([]*models.Task, error) {
 	var tasks []*models.Task
 	if err := r.db.
