@@ -388,6 +388,28 @@ func (h *TaskHandler) RemoveTagFromTask(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"task": task})
 }
 
+func (h *TaskHandler) GetTaskCount(c *gin.Context) {
+	claimsRaw, exists := c.Get("claims")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	claims := claimsRaw.(jwt.MapClaims)
+	userID := claims["user_id"].(string)
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User ID not found in claims"})
+		return
+	}
+
+	count, err := h.service.GetTaskCount(uuid.MustParse(userID))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"count": count})
+}
+
 // func (h *TaskHandler) BatchUpdateTasks(c *gin.Context) {
 // 	var raw json.RawMessage
 // 	if err := c.ShouldBindJSON(&raw); err != nil {

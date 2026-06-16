@@ -366,3 +366,7 @@ func (s *TaskService) BatchUpdateTasks(dto *dtos.BatchUpdateDTO) error {
 	}
 	return s.repo.BatchUpdateTasks(tasks)
 }
+
+func (s *TaskService) GetTaskCount(userId uuid.UUID) (int64, error) {
+	return s.repo.CountTasksByUserId(userId)
+}

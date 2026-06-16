@@ -137,3 +137,11 @@ func (r *TaskRepository) GetTaskByIdWithTags(id uuid.UUID) (*models.Task, error)
 func (r *TaskRepository) BatchUpdateTasks(tasks []models.Task) error {
 	return r.db.Save(&tasks).Error
 }
+
+func (r *TaskRepository) CountTasksByUserId(userId uuid.UUID) (int64, error) {
+	var count int64
+	if err := r.db.Model(&models.Task{}).Where("user_id = ? AND parent_id IS NULL", userId).Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return count, nil
+}
