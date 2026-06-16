@@ -8,8 +8,9 @@ import (
 	"beel_api/src/internal/repositories"
 	"beel_api/src/internal/services"
 	"beel_api/src/migrations"
+	"net/http"
 	"os"
-
+	"strings"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -23,8 +24,27 @@ func main() {
 
 	r := gin.Default()
 
+	r.GET("/health", func(c *gin.Context) {
+		sqlDB, err := db.DB.DB()
+		status := "ok"
+		dbStatus := "connected"
+		if err != nil || sqlDB.Ping() != nil {
+			status = "degraded"
+			dbStatus = "disconnected"
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"status":   status,
+			"database": dbStatus,
+		})
+	})
+
+	allowedOrigins := os.Getenv("ALLOW_ORIGINS")
+	if allowedOrigins == "" {
+		allowedOrigins = "http://localhost:4321"
+	}
+
 	config := cors.Config{
-		AllowOrigins:  []string{"http://localhost:4321"},
+		AllowOrigins:  strings.Split(allowedOrigins, ","),
 		AllowMethods:  []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"},
 		AllowHeaders:  []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders: []string{"Content-Length"},
