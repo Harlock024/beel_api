@@ -47,6 +47,7 @@ func main() {
 		tagHandler := handlers.NewTagHandler(services.NewTagService(repositories.NewTagRepository(db.DB)))
 		columnHandler := handlers.NewColumnHandler(services.NewColumnService(repositories.NewColumnRepository(db.DB)))
 		boardHandler := handlers.NewBoardHandler(services.NewBoardService(repositories.NewBoardRepository(db.DB)))
+		userHandler := handlers.NewUserHandler(services.NewUserServices(repositories.NewUserRepository(db.DB)))
 		// Apply authentication middleware
 		api.Use(middleware.AuthMiddleware())
 
@@ -55,6 +56,7 @@ func main() {
 		routes.TagRoutes(api, tagHandler)
 		routes.BoardRoutes(api, boardHandler, columnHandler)
 		routes.ColumnRoutes(api, columnHandler)
+		routes.UserRoutes(api, userHandler)
 	}
 
 	port := os.Getenv("PORT")

@@ -137,7 +137,7 @@ func (h *TaskHandler) DeleteTask(c *gin.Context) {
 		return
 	}
 
-	h.service.DeleteTask(uuid.MustParse(taskID))
+	h.service.DeleteTask(uuid.MustParse(taskID), uuid.MustParse(user_id))
 
 	c.JSON(http.StatusNoContent, gin.H{"message": "Task deleted successfully"})
 	return
@@ -168,7 +168,7 @@ func (h *TaskHandler) UpdateTask(c *gin.Context) {
 		return
 	}
 
-	taskRes, err := h.service.UpdateTask(uuid.MustParse(taskID), &task)
+	taskRes, err := h.service.UpdateTask(uuid.MustParse(taskID), uuid.MustParse(user_id), &task)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -264,7 +264,7 @@ func (h *TaskHandler) AddSubtask(c *gin.Context) {
 		return
 	}
 
-	subtask, err := h.service.AddSubtask(uuid.MustParse(parentID), &dto, uuid.MustParse(user_id))
+	subtask, err := h.service.AddSubtask(uuid.MustParse(parentID), uuid.MustParse(user_id), &dto, uuid.MustParse(user_id))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -293,7 +293,7 @@ func (h *TaskHandler) RemoveSubtask(c *gin.Context) {
 		return
 	}
 
-	err := h.service.RemoveSubtask(uuid.MustParse(parentID), uuid.MustParse(subtaskID))
+	err := h.service.RemoveSubtask(uuid.MustParse(parentID), uuid.MustParse(subtaskID), uuid.MustParse(user_id))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -350,7 +350,7 @@ func (h *TaskHandler) AddTagToTask(c *gin.Context) {
 		return
 	}
 
-	task, err := h.service.AddTagToTask(uuid.MustParse(taskID), uuid.MustParse(tagID))
+	task, err := h.service.AddTagToTask(uuid.MustParse(taskID), uuid.MustParse(tagID), uuid.MustParse(user_id))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -379,7 +379,7 @@ func (h *TaskHandler) RemoveTagFromTask(c *gin.Context) {
 		return
 	}
 
-	task, err := h.service.RemoveTagFromTask(uuid.MustParse(taskID), uuid.MustParse(tagID))
+	task, err := h.service.RemoveTagFromTask(uuid.MustParse(taskID), uuid.MustParse(tagID), uuid.MustParse(user_id))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

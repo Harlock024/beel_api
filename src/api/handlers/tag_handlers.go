@@ -91,7 +91,7 @@ func (h *TagHandler) UpdateTag(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Tag ID is required"})
 		return
 	}
-	updatedTagRes, err := h.service.UpdateTag(uuid.MustParse(tagId), tag)
+	updatedTagRes, err := h.service.UpdateTag(uuid.MustParse(tagId), uuid.MustParse(userID), tag)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -118,7 +118,7 @@ func (h *TagHandler) DeleteTag(c *gin.Context) {
 		return
 	}
 
-	err := h.service.DeleteTag(uuid.MustParse(tagId))
+	err := h.service.DeleteTag(uuid.MustParse(tagId), uuid.MustParse(userID))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

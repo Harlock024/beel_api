@@ -31,6 +31,14 @@ func (r *ColumnRepository) GetColumnById(id uuid.UUID) (*models.Column, error) {
 	return &column, nil
 }
 
+func (r *ColumnRepository) GetColumnByIdWithBoard(id uuid.UUID) (*models.Column, error) {
+	var column models.Column
+	if err := r.db.Preload("Board").Where("id = ?", id).First(&column).Error; err != nil {
+		return nil, err
+	}
+	return &column, nil
+}
+
 func (r *ColumnRepository) CreateColumn(column *models.Column) (*models.Column, error) {
 	if err := r.db.Create(column).Error; err != nil {
 		return nil, err

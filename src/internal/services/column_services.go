@@ -5,6 +5,7 @@ import (
 	"beel_api/src/dtos"
 	"beel_api/src/internal/models"
 	"beel_api/src/internal/repositories"
+	"fmt"
 
 	"github.com/google/uuid"
 )
@@ -32,7 +33,7 @@ func (s *ColumnService) GetColumnsByBoardId(boardId uuid.UUID) ([]responses.Colu
 	return columnResponses, nil
 }
 
-func (s *ColumnService) CreateColumn(boardId uuid.UUID, dto *dtos.ColumnDTO) (*responses.ColumnResponse, error) {
+func (s *ColumnService) CreateColumn(boardId uuid.UUID, userId uuid.UUID, dto *dtos.ColumnDTO) (*responses.ColumnResponse, error) {
 	maxPos, err := s.repo.GetMaxPosition(boardId)
 	if err != nil {
 		return nil, err
@@ -54,10 +55,14 @@ func (s *ColumnService) CreateColumn(boardId uuid.UUID, dto *dtos.ColumnDTO) (*r
 	return &resp, nil
 }
 
-func (s *ColumnService) UpdateColumn(columnId uuid.UUID, dto *dtos.UpdateColumnDTO) (*responses.ColumnResponse, error) {
-	existing, err := s.repo.GetColumnById(columnId)
+func (s *ColumnService) UpdateColumn(columnId uuid.UUID, userId uuid.UUID, dto *dtos.UpdateColumnDTO) (*responses.ColumnResponse, error) {
+	existing, err := s.repo.GetColumnByIdWithBoard(columnId)
 	if err != nil {
 		return nil, err
+	}
+
+	if existing.Board.UserID != userId {
+		return nil, fmt.Errorf("forbidden: you do not own this column")
 	}
 
 	if dto.Title != "" {
@@ -76,6 +81,15 @@ func (s *ColumnService) UpdateColumn(columnId uuid.UUID, dto *dtos.UpdateColumnD
 	return &resp, nil
 }
 
-func (s *ColumnService) DeleteColumn(columnId uuid.UUID) error {
+func (s *ColumnService) DeleteColumn(columnId uuid.UUID, userId uuid.UUID) error {
+	existing, err := s.repo.GetColumnByIdWithBoard(columnId)
+	if err != nil {
+		return err
+	}
+
+	if existing.Board.UserID != userId {
+		return fmt.Errorf("forbidden: you do not own this column")
+	}
+
 	return s.repo.DeleteColumn(columnId)
 }

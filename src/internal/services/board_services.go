@@ -5,6 +5,7 @@ import (
 	"beel_api/src/dtos"
 	"beel_api/src/internal/models"
 	"beel_api/src/internal/repositories"
+	"fmt"
 
 	"github.com/google/uuid"
 )
@@ -57,10 +58,14 @@ func (s *BoardService) CreateBoard(userId uuid.UUID, dto *dtos.BoardDTO) (*respo
 	return &resp, nil
 }
 
-func (s *BoardService) UpdateBoard(boardId uuid.UUID, dto *dtos.BoardDTO) (*responses.BoardResponse, error) {
+func (s *BoardService) UpdateBoard(boardId uuid.UUID, userId uuid.UUID, dto *dtos.BoardDTO) (*responses.BoardResponse, error) {
 	existing, err := s.repo.GetBoardById(boardId)
 	if err != nil {
 		return nil, err
+	}
+
+	if existing.UserID != userId {
+		return nil, fmt.Errorf("forbidden: you do not own this board")
 	}
 
 	if dto.Title != "" {
@@ -76,6 +81,15 @@ func (s *BoardService) UpdateBoard(boardId uuid.UUID, dto *dtos.BoardDTO) (*resp
 	return &resp, nil
 }
 
-func (s *BoardService) DeleteBoard(boardId uuid.UUID) error {
+func (s *BoardService) DeleteBoard(boardId uuid.UUID, userId uuid.UUID) error {
+	existing, err := s.repo.GetBoardById(boardId)
+	if err != nil {
+		return err
+	}
+
+	if existing.UserID != userId {
+		return fmt.Errorf("forbidden: you do not own this board")
+	}
+
 	return s.repo.DeleteBoard(boardId)
 }

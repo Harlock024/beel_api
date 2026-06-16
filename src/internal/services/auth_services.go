@@ -46,7 +46,7 @@ func (s *AuthService) Register(dto dtos.RegisterDTO) (*responses.LoginResponse, 
 	if err := s.refreshRepo.SaveRefreshToken(&models.RefreshToken{
 		ID:          uuid.New(),
 		UserID:      user.ID,
-		HashedToken: refreshToken,
+		HashedToken: utils.HashToken(refreshToken),
 		ExpiresAt:   time.Now().Add(time.Hour * 24 * 7),
 	}); err != nil {
 		return nil, err

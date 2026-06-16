@@ -121,7 +121,7 @@ func (h *BoardHandler) UpdateBoard(c *gin.Context) {
 		return
 	}
 
-	board, err := h.service.UpdateBoard(uuid.MustParse(boardID), &dto)
+	board, err := h.service.UpdateBoard(uuid.MustParse(boardID), uuid.MustParse(userID), &dto)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -149,7 +149,7 @@ func (h *BoardHandler) DeleteBoard(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.DeleteBoard(uuid.MustParse(boardID)); err != nil {
+	if err := h.service.DeleteBoard(uuid.MustParse(boardID), uuid.MustParse(userID)); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

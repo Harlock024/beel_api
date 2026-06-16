@@ -17,9 +17,9 @@ type Task struct {
 	CreatedAt   time.Time  `json:"created_at"`
 	ListID      *uuid.UUID `json:"list_id" gorm:"index"`
 	List        *List      `gorm:"foreignKey:ListID"`
-	Tags        []Tag      `gorm:"many2many:task_tags;"`
+	Tags        []Tag      `gorm:"many2many:task_tags;constraint:OnDelete:CASCADE;"`
 	ParentID    *uuid.UUID `json:"parent_id" gorm:"index"`
-	Subtasks    []Task     `gorm:"foreignKey:ParentID"`
+	Subtasks    []Task     `gorm:"foreignKey:ParentID;constraint:OnDelete:CASCADE;"`
 	ColumnID    *uuid.UUID `json:"column_id" gorm:"index"`
 	Position    int        `json:"position" gorm:"default:0"`
 }

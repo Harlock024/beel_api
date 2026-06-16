@@ -67,7 +67,6 @@ func (s *TaskService) CreateTask(task *dtos.NewTaskDTO, list_id *uuid.UUID, user
 		DueDate:  formatDueDate(task.DueDate),
 		ParentID: task.ParentID,
 	}
-	println(newTask)
 	err := s.repo.CreateTask(newTask)
 	if err != nil {
 		return nil, err
@@ -75,11 +74,15 @@ func (s *TaskService) CreateTask(task *dtos.NewTaskDTO, list_id *uuid.UUID, user
 	return responses.NewTaskResponse(newTask), nil
 }
 
-func (s *TaskService) UpdateTask(task_id uuid.UUID, task *dtos.UpdateTaskDTO) (*responses.TaskResponse, error) {
+func (s *TaskService) UpdateTask(task_id uuid.UUID, userId uuid.UUID, task *dtos.UpdateTaskDTO) (*responses.TaskResponse, error) {
 
 	existingTask, err := s.repo.GetTaskById(task_id)
 	if err != nil {
 		return nil, err
+	}
+
+	if existingTask.UserID != userId {
+		return nil, fmt.Errorf("forbidden: you do not own this task")
 	}
 	if task.Title != "" {
 		existingTask.Title = task.Title
@@ -145,11 +148,15 @@ func (s *TaskService) UpdateTask(task_id uuid.UUID, task *dtos.UpdateTaskDTO) (*
 
 	return responses.NewTaskResponse(updatedTask), nil
 }
-func (s *TaskService) DeleteTask(task_id uuid.UUID) error {
+func (s *TaskService) DeleteTask(task_id uuid.UUID, userId uuid.UUID) error {
 
 	existingTask, err := s.repo.GetTaskById(task_id)
 	if err != nil {
 		return err
+	}
+
+	if existingTask.UserID != userId {
+		return fmt.Errorf("forbidden: you do not own this task")
 	}
 	err = s.repo.DeleteTask(existingTask)
 	if err != nil {
@@ -242,17 +249,21 @@ func (s *TaskService) GetSubtasksByParentId(parentId uuid.UUID) ([]*responses.Ta
 	return taskResponses, nil
 }
 
-func (s *TaskService) AddSubtask(parentId uuid.UUID, dto *dtos.NewTaskDTO, user_id uuid.UUID) (*responses.TaskResponse, error) {
+func (s *TaskService) AddSubtask(parentId uuid.UUID, userId uuid.UUID, dto *dtos.NewTaskDTO, subtaskUserId uuid.UUID) (*responses.TaskResponse, error) {
 	parent, err := s.repo.GetTaskByIdRaw(parentId)
 	if err != nil {
 		return nil, err
+	}
+
+	if parent.UserID != userId {
+		return nil, fmt.Errorf("forbidden: you do not own this task")
 	}
 
 	newSubtask := &models.Task{
 		ID:       uuid.New(),
 		Title:    dto.Title,
 		ListID:   parent.ListID,
-		UserID:   user_id,
+		UserID:   subtaskUserId,
 		ParentID: &parentId,
 	}
 	if err := s.repo.CreateTask(newSubtask); err != nil {
@@ -261,13 +272,27 @@ func (s *TaskService) AddSubtask(parentId uuid.UUID, dto *dtos.NewTaskDTO, user_
 	return responses.NewTaskResponse(newSubtask), nil
 }
 
-func (s *TaskService) RemoveSubtask(parentId uuid.UUID, subtaskId uuid.UUID) error {
+func (s *TaskService) RemoveSubtask(parentId uuid.UUID, subtaskId uuid.UUID, userId uuid.UUID) error {
+	parent, err := s.repo.GetTaskByIdRaw(parentId)
+	if err != nil {
+		return err
+	}
+
+	if parent.UserID != userId {
+		return fmt.Errorf("forbidden: you do not own this task")
+	}
+
 	subtask, err := s.repo.GetTaskByIdRaw(subtaskId)
 	if err != nil {
 		return err
 	}
+
+	if subtask.UserID != userId {
+		return fmt.Errorf("forbidden: you do not own this subtask")
+	}
+
 	if subtask.ParentID == nil || *subtask.ParentID != parentId {
-		return err
+		return fmt.Errorf("subtask does not belong to the specified parent")
 	}
 	return s.repo.DeleteTask(subtask)
 }
@@ -287,22 +312,40 @@ func (s *TaskService) GetTasksByTag(tagId uuid.UUID) ([]*responses.TaskResponse,
 	return taskResponses, nil
 }
 
-func (s *TaskService) AddTagToTask(taskId uuid.UUID, tagId uuid.UUID) (*responses.TaskResponse, error) {
+func (s *TaskService) AddTagToTask(taskId uuid.UUID, tagId uuid.UUID, userId uuid.UUID) (*responses.TaskResponse, error) {
+	task, err := s.repo.GetTaskByIdRaw(taskId)
+	if err != nil {
+		return nil, err
+	}
+
+	if task.UserID != userId {
+		return nil, fmt.Errorf("forbidden: you do not own this task")
+	}
+
 	if err := s.repo.AddTagToTask(taskId, tagId); err != nil {
 		return nil, err
 	}
-	task, err := s.repo.GetTaskByIdWithTags(taskId)
+	task, err = s.repo.GetTaskByIdWithTags(taskId)
 	if err != nil {
 		return nil, err
 	}
 	return responses.NewTaskResponse(task), nil
 }
 
-func (s *TaskService) RemoveTagFromTask(taskId uuid.UUID, tagId uuid.UUID) (*responses.TaskResponse, error) {
+func (s *TaskService) RemoveTagFromTask(taskId uuid.UUID, tagId uuid.UUID, userId uuid.UUID) (*responses.TaskResponse, error) {
+	task, err := s.repo.GetTaskByIdRaw(taskId)
+	if err != nil {
+		return nil, err
+	}
+
+	if task.UserID != userId {
+		return nil, fmt.Errorf("forbidden: you do not own this task")
+	}
+
 	if err := s.repo.RemoveTagFromTask(taskId, tagId); err != nil {
 		return nil, err
 	}
-	task, err := s.repo.GetTaskByIdWithTags(taskId)
+	task, err = s.repo.GetTaskByIdWithTags(taskId)
 	if err != nil {
 		return nil, err
 	}

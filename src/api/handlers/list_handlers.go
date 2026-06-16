@@ -165,7 +165,7 @@ func (h *ListHandler) DeleteList(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "List ID is required"})
 		return
 	}
-	if err := h.service.DeleteList(uuid.MustParse(list_id)); err != nil {
+	if err := h.service.DeleteList(uuid.MustParse(list_id), uuid.MustParse(user_id)); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}

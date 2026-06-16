@@ -5,6 +5,7 @@ import (
 	"beel_api/src/dtos"
 	"beel_api/src/internal/models"
 	"beel_api/src/internal/repositories"
+	"fmt"
 
 	"github.com/google/uuid"
 )
@@ -73,7 +74,16 @@ func (s *ListService) UpdateList(list_id uuid.UUID, list dtos.ListDTO, user_id u
 	return &listResponse, nil
 }
 
-func (s *ListService) DeleteList(list_id uuid.UUID) error {
+func (s *ListService) DeleteList(list_id uuid.UUID, userId uuid.UUID) error {
+	existing, err := s.repo.GetListById(list_id, userId)
+	if err != nil {
+		return err
+	}
+
+	if existing.UserID != userId {
+		return fmt.Errorf("forbidden: you do not own this list")
+	}
+
 	if err := s.repo.DeleteList(list_id); err != nil {
 		return err
 	}

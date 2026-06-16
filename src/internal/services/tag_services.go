@@ -5,6 +5,7 @@ import (
 	"beel_api/src/dtos"
 	"beel_api/src/internal/models"
 	"beel_api/src/internal/repositories"
+	"fmt"
 
 	"github.com/google/uuid"
 )
@@ -51,11 +52,16 @@ func (s *TagService) CreateTag(tag *dtos.TagDTO, userId uuid.UUID) (*responses.T
 	tagResponse := responses.NewTagResponse(newTag)
 	return &tagResponse, nil
 }
-func (s *TagService) UpdateTag(tagId uuid.UUID, tag dtos.TagDTO) (*responses.TagResponse, error) {
+func (s *TagService) UpdateTag(tagId uuid.UUID, userId uuid.UUID, tag dtos.TagDTO) (*responses.TagResponse, error) {
 	existingTag, err := s.repo.GetTagById(tagId)
 	if err != nil {
 		return nil, err
 	}
+
+	if existingTag.UserID != userId {
+		return nil, fmt.Errorf("forbidden: you do not own this tag")
+	}
+
 	existingTag.Name = tag.Name
 	existingTag.Color = tag.Color
 
@@ -67,11 +73,16 @@ func (s *TagService) UpdateTag(tagId uuid.UUID, tag dtos.TagDTO) (*responses.Tag
 	return &tagResponse, nil
 }
 
-func (s *TagService) DeleteTag(tagId uuid.UUID) error {
+func (s *TagService) DeleteTag(tagId uuid.UUID, userId uuid.UUID) error {
 	tag, err := s.repo.GetTagById(tagId)
 	if err != nil {
 		return err
 	}
+
+	if tag.UserID != userId {
+		return fmt.Errorf("forbidden: you do not own this tag")
+	}
+
 	if err := s.repo.DeleteTag(tag); err != nil {
 		return err
 	}

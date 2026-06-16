@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
 
@@ -46,7 +47,15 @@ func (h *ColumnHandler) CreateColumn(c *gin.Context) {
 		return
 	}
 
-	column, err := h.service.CreateColumn(uuid.MustParse(boardID), &dto)
+	claimsRaw, exists := c.Get("claims")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	claims := claimsRaw.(jwt.MapClaims)
+	userID := claims["user_id"].(string)
+
+	column, err := h.service.CreateColumn(uuid.MustParse(boardID), uuid.MustParse(userID), &dto)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -68,7 +77,15 @@ func (h *ColumnHandler) UpdateColumn(c *gin.Context) {
 		return
 	}
 
-	column, err := h.service.UpdateColumn(uuid.MustParse(columnID), &dto)
+	claimsRaw, exists := c.Get("claims")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	claims := claimsRaw.(jwt.MapClaims)
+	userID := claims["user_id"].(string)
+
+	column, err := h.service.UpdateColumn(uuid.MustParse(columnID), uuid.MustParse(userID), &dto)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -84,7 +101,15 @@ func (h *ColumnHandler) DeleteColumn(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.DeleteColumn(uuid.MustParse(columnID)); err != nil {
+	claimsRaw, exists := c.Get("claims")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	claims := claimsRaw.(jwt.MapClaims)
+	userID := claims["user_id"].(string)
+
+	if err := h.service.DeleteColumn(uuid.MustParse(columnID), uuid.MustParse(userID)); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
