@@ -145,3 +145,21 @@ func (r *TaskRepository) CountTasksByUserId(userId uuid.UUID) (int64, error) {
 	}
 	return count, nil
 }
+
+func (r *TaskRepository) CountTasksByFilter(start string, end string, userId uuid.UUID) (int64, error) {
+	var count int64
+	if err := r.db.Model(&models.Task{}).
+		Where("user_id = ? AND due_date >= ? AND due_date < ? AND parent_id IS NULL", userId, start, end).
+		Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+func (r *TaskRepository) CountCompletedTasksByUserId(userId uuid.UUID) (int64, error) {
+	var count int64
+	if err := r.db.Model(&models.Task{}).Where("user_id = ? AND is_completed = ? AND parent_id IS NULL", userId, true).Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return count, nil
+}

@@ -401,7 +401,9 @@ func (h *TaskHandler) GetTaskCount(c *gin.Context) {
 		return
 	}
 
-	count, err := h.service.GetTaskCount(uuid.MustParse(userID))
+	filter := c.Query("filter")
+
+	count, err := h.service.GetTaskCount(uuid.MustParse(userID), filter)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

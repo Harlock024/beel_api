@@ -367,6 +367,20 @@ func (s *TaskService) BatchUpdateTasks(dto *dtos.BatchUpdateDTO) error {
 	return s.repo.BatchUpdateTasks(tasks)
 }
 
-func (s *TaskService) GetTaskCount(userId uuid.UUID) (int64, error) {
-	return s.repo.CountTasksByUserId(userId)
+func (s *TaskService) GetTaskCount(userId uuid.UUID, filter string) (int64, error) {
+	switch filter {
+	case "today":
+		start := time.Now()
+		end := start.AddDate(0, 0, 1)
+		return s.repo.CountTasksByFilter(start.Format(time.DateOnly), end.Format(time.DateOnly), userId)
+	case "upcoming":
+		loc, _ := time.LoadLocation("America/Mexico_City")
+		start := time.Now().In(loc).Truncate(24 * time.Hour).Add(24 * time.Hour).UTC()
+		end := start.Add(7 * 24 * time.Hour).UTC()
+		return s.repo.CountTasksByFilter(start.String(), end.String(), userId)
+	case "completed":
+		return s.repo.CountCompletedTasksByUserId(userId)
+	default:
+		return s.repo.CountTasksByUserId(userId)
+	}
 }
