@@ -79,7 +79,7 @@ func main() {
 		routes.UserRoutes(api, userHandler)
 	}
 
-	port := os.Getenv("PORT")
+	port := os.Getenv("GO_PORT")
 	if port == "" {
 		port = "8080"
 	}
