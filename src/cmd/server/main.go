@@ -21,7 +21,7 @@ func main() {
 	db.InitDB()
 	migrations.Run()
 
-
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 
 	r.GET("/health", func(c *gin.Context) {
@@ -61,7 +61,6 @@ func main() {
 	}
 	api := r.Group("/api")
 	{
-		// Initialize repositories and services
 		taskHandler := handlers.NewTaskHandler(services.NewTaskService(repositories.NewTaskRepository(db.DB)))
 		listHandler := handlers.NewListHandler(services.NewListService(repositories.NewListRepository(db.DB)))
 		tagHandler := handlers.NewTagHandler(services.NewTagService(repositories.NewTagRepository(db.DB)))
